@@ -2,12 +2,10 @@
   "manifest_version": 3,
   "name": "RemoveTube - Anti-Procrastination",
   "version": "1.0.0",
-  "description": "Helps prevent unintended procrastination on YouTube by filtering content based on your allowed topics",
+  "description": "AI-powered YouTube content filter to help you stay focused on your allowed topics",
   
   "permissions": [
-    "storage",
-    "activeTab",
-    "scripting"
+    "storage"
   ],
   
   "host_permissions": [
@@ -17,26 +15,26 @@
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],
-      "js": ["content.js"],
+      "js": ["lib/transformers.min.js", "js/ai-classifier.js", "js/content.js"],
       "run_at": "document_start",
       "all_frames": false
     }
   ],
   
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "js/background.js"
   },
   
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "html/popup.html",
     "default_title": "RemoveTube Settings"
   },
   
-  "options_page": "options.html",
+  "options_page": "html/options.html",
   
   "web_accessible_resources": [
     {
-      "resources": ["overlay.html", "overlay.css"],
+      "resources": ["lib/transformers.min.js", "js/ai-classifier.js"],
       "matches": ["*://*.youtube.com/*"]
     }
   ]

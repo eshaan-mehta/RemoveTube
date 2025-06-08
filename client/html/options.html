@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>RemoveTube Settings</title>
+  <link rel="stylesheet" href="../css/options.css">
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎯 RemoveTube Settings</h1>
+      <p>Configure your content filtering preferences to stay focused and productive</p>
+    </div>
+
+    <div class="section ai-section">
+      <h2>🧠 Browser-Based AI Filtering</h2>
+      <div class="ai-info-card">
+        <h3>Powered by Local AI Models</h3>
+        <p>RemoveTube uses advanced AI models that run directly in your browser:</p>
+        <ul>
+          <li>✅ <strong>Privacy First:</strong> No data leaves your browser</li>
+          <li>✅ <strong>No API Keys:</strong> Works instantly without setup</li>
+          <li>✅ <strong>Smart Classification:</strong> Advanced content understanding</li>
+          <li>✅ <strong>Fast & Reliable:</strong> Instant analysis, no network delays</li>
+        </ul>
+        <p style="margin-top: 15px; font-size: 13px; opacity: 0.9;">
+          <strong>Models:</strong> Uses DistilBERT for zero-shot classification and MiniLM for semantic similarity
+        </p>
+      </div>
+    </div>
+
+    <div class="section topics-section">
+      <h2>Allowed Content Topics</h2>
+      <div class="form-group">
+        <label for="allowedTopics">What content do you want to allow?</label>
+        <textarea id="allowedTopics" placeholder="Enter topics separated by commas or new lines..."></textarea>
+        <small>
+          Examples: education, programming, music, cooking, fitness, science, history, language learning
+        </small>
+      </div>
+      
+      <div class="preset-buttons">
+        <div class="preset-btn" data-topics="education,learning,tutorial,programming,coding,science">📚 Study & Learning</div>
+        <div class="preset-btn" data-topics="music,instrumental,classical,jazz,ambient">🎵 Music Only</div>
+        <div class="preset-btn" data-topics="exercise,fitness,workout,yoga,health,nutrition">💪 Health & Fitness</div>
+        <div class="preset-btn" data-topics="cooking,recipe,baking,food">🍳 Cooking</div>
+        <div class="preset-btn" data-topics="meditation,mindfulness,relaxation,sleep">🧘 Mindfulness</div>
+        <div class="preset-btn" data-topics="news,current events,politics,economics">📰 News</div>
+      </div>
+      
+      <div id="currentTopics" class="current-topics" style="display: none;">
+        <strong>Current Topics:</strong>
+        <div id="topicTags"></div>
+      </div>
+    </div>
+
+    <div class="section settings-section">
+      <h2>Filtering Settings</h2>
+      
+      <div class="checkbox-group">
+        <input type="checkbox" id="strictMode" checked />
+        <label for="strictMode">
+          <strong>Strict Mode</strong> - Block videos when uncertain about their content
+        </label>
+      </div>
+      
+      <div class="checkbox-group">
+        <input type="checkbox" id="enableExtension" checked />
+        <label for="enableExtension">
+          <strong>Enable Extension</strong> - Turn filtering on/off
+        </label>
+      </div>
+    </div>
+
+    <div class="section stats-section">
+      <h2>Usage Statistics</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number" id="todayBlocked">0</div>
+          <div class="stat-label">Blocked Today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="todayAllowed">0</div>
+          <div class="stat-label">Allowed Today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="totalBlocked">0</div>
+          <div class="stat-label">Total Blocked</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="streakDays">0</div>
+          <div class="stat-label">Day Streak</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-message" id="statusMessage"></div>
+
+    <div style="text-align: center; margin-top: 30px;">
+      <button id="saveBtn" class="btn btn-primary">💾 Save Settings</button>
+      <button id="resetBtn" class="btn btn-danger">🗑️ Reset All</button>
+      <button id="testBtn" class="btn btn-secondary">🧪 Test Filtering</button>
+    </div>
+  </div>
+
+  <script src="../js/options.js"></script>
+</body>
+</html>

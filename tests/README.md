@@ -9,7 +9,7 @@ tests/
 ├── README.md                           # This file
 ├── run-tests.sh                        # Main test runner script
 ├── validate-extension.sh               # Extension validation script
-├── test-api-key.html                   # API key testing interface
+├── browser-ai-test.html                # Browser-based AI testing interface
 ├── implementation-complete.html        # Implementation status page
 ├── setup-wizard-updates.html           # Setup wizard testing guide
 ├── early-video-check-improvements.md   # Early video check documentation
@@ -30,8 +30,8 @@ cd tests
 ./validate-extension.sh
 ```
 
-### Test API Key
-Open `test-api-key.html` in a browser to test Hugging Face API connectivity.
+### Test Browser-Based AI
+Open `browser-ai-test.html` in a browser to test the new AI classification system.
 
 ## 📋 Test Files Description
 

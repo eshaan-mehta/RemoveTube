@@ -5,8 +5,9 @@ RemoveTube helps you stay focused and productive on YouTube by filtering content
 ## ✨ Features
 
 - **Smart Content Filtering**: Automatically blocks YouTube videos that don't match your allowed topics
-- **AI-Powered Classification**: Uses Hugging Face's BART model for accurate content categorization
-- **Fallback Keyword Matching**: Works even without an API key using simple keyword matching
+- **Browser-Based AI**: Uses cutting-edge AI models that run directly in your browser - no API keys needed!
+- **Advanced Classification**: Multiple AI methods including zero-shot classification and semantic similarity
+- **Privacy First**: All AI processing happens locally - your data never leaves your browser
 - **Customizable Topics**: Set your own allowed content categories
 - **Flexible Modes**: Choose between strict and relaxed filtering
 - **Usage Statistics**: Track your productivity with daily stats
@@ -47,16 +48,17 @@ cd RemoveTube/client
 3. Add your allowed topics (comma-separated):
    - Examples: `education, programming, music, cooking, fitness`
    - Use preset buttons for quick setup
-4. Optionally add your Hugging Face API key for enhanced filtering
+4. Enjoy advanced AI-powered filtering that works completely offline!
 
-### Hugging Face API Key (Optional but Recommended)
+### Browser-Based AI Processing
 
-For more accurate content classification:
+RemoveTube now uses state-of-the-art AI models that run directly in your browser:
 
-1. Visit [Hugging Face](https://huggingface.co/settings/tokens)
-2. Create a free account and generate an API token
-3. Add the token to your RemoveTube settings
-4. Enjoy more precise content filtering!
+- **Zero-Shot Classification**: Uses DistilBERT for understanding content context
+- **Semantic Similarity**: Uses all-MiniLM-L6-v2 for finding topic relationships  
+- **Hierarchical Analysis**: Smart two-stage classification for better accuracy
+- **Complete Privacy**: All AI processing happens locally - no data sent to external servers
+- **No Setup Required**: No API keys, accounts, or configuration needed!
 
 ## 🛠️ How to Use
 
@@ -88,21 +90,23 @@ Choose from predefined topic sets:
 
 ### Content Analysis Methods
 
-1. **AI Classification** (with API key):
-   - Uses Facebook's BART-large-mnli model via Hugging Face
-   - Analyzes video title and description
-   - Provides confidence scores for filtering decisions
+1. **Browser-Based AI Classification**:
+   - Uses DistilBERT and all-MiniLM-L6-v2 models via Transformers.js
+   - Hierarchical classification: title first, then full content
+   - Semantic similarity matching for better topic understanding
+   - Runs completely offline in your browser
 
 2. **Keyword Matching** (fallback):
    - Simple but effective keyword-based filtering
-   - Works offline without external API calls
+   - Automatic fallback if AI models fail to load
    - Matches topics against video titles and descriptions
 
 ### Privacy & Security
 
+- **Complete Privacy**: All AI processing happens in your browser - no external API calls
 - **Local Storage**: All settings stored locally in Chrome's storage
-- **No Data Collection**: Extension doesn't collect or transmit personal data
-- **API Usage**: Hugging Face API only receives video titles/descriptions for classification
+- **No Data Collection**: Extension doesn't collect, store, or transmit any personal data
+- **Offline Operation**: Works completely offline once models are loaded
 - **Open Source**: Full source code available for transparency
 
 ## 📊 Statistics & Insights
@@ -141,17 +145,20 @@ Track your productivity with built-in statistics:
 - Verify your allowed topics are set correctly
 - Check if strict mode is enabled for more aggressive filtering
 - Try adding more specific keywords for your allowed content
+- Wait for AI models to load on first use (may take a moment)
 
-**API key not working:**
-- Ensure your Hugging Face API key is valid and active
-- Check your API usage limits on Hugging Face dashboard
-- The extension will fall back to keyword matching if API fails
+**AI models not loading:**
+- Ensure you have a stable internet connection for initial model download
+- Check browser console for any error messages
+- Try refreshing the page if models fail to load
+- Extension will automatically fall back to keyword matching if AI fails
 
 ### Performance Tips
 
 - **Topic Optimization**: Use 3-7 well-chosen topics for best results
-- **API Limits**: Monitor your Hugging Face API usage to avoid rate limits
-- **Browser Performance**: The extension is lightweight but processes each video page load
+- **First Load**: AI models download on first use - subsequent loads are instant
+- **Browser Performance**: Extension is optimized for minimal resource usage
+- **Model Caching**: AI models are cached locally for fast repeated use
 
 ## 🤝 Contributing
 
@@ -179,7 +186,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **Hugging Face**: For providing the excellent BART-large-mnli model
+- **Transformers.js**: For enabling browser-based AI with excellent models
+- **Hugging Face**: For providing the DistilBERT and all-MiniLM-L6-v2 models
 - **Chrome Extension APIs**: For enabling seamless browser integration
 - **Open Source Community**: For inspiration and best practices
 

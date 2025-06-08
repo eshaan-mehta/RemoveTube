@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>RemoveTube</title>
+  <link rel="stylesheet" href="../css/popup.css">
+<body>
+  <div class="header">
+    <h1>🎯 RemoveTube</h1>
+  </div>
+  
+  <div id="status" class="status">
+    Loading...
+  </div>
+  
+  <div class="quick-actions">
+    <button id="toggleBtn" class="btn-primary">Toggle</button>
+    <button id="settingsBtn" class="btn-secondary">Settings</button>
+  </div>
+  
+  <div class="stats">
+    <h3>📊 Today's Stats</h3>
+    <div class="stat-item">
+      <span>Videos Blocked:</span>
+      <span id="blockedCount">0</span>
+    </div>
+    <div class="stat-item">
+      <span>Videos Allowed:</span>
+      <span id="allowedCount">0</span>
+    </div>
+  </div>
+  
+  <div class="stats">
+    <h3>✅ Allowed Topics</h3>
+    <div id="topicsList" class="topics-list">
+      No topics set
+    </div>
+  </div>
+  
+  <div class="footer">
+    Stay focused, stay productive!
+  </div>
+  
+  <script src="../js/popup.js"></script>
+</body>
+</html>

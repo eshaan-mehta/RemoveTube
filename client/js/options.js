@@ -1,6 +1,5 @@
 // Options page script for RemoveTube extension
 document.addEventListener('DOMContentLoaded', () => {
-  const hfApiKeyInput = document.getElementById('hfApiKey');
   const allowedTopicsInput = document.getElementById('allowedTopics');
   const strictModeCheckbox = document.getElementById('strictMode');
   const enableExtensionCheckbox = document.getElementById('enableExtension');
@@ -20,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load saved settings
   function loadSettings() {
     chrome.storage.sync.get([
-      'hfApiKey',
       'allowedTopics', 
       'strictMode',
       'extensionEnabled',
@@ -28,8 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
       'totalStats',
       'streak'
     ], (data) => {
-      hfApiKeyInput.value = data.hfApiKey || '';
-      
       const topics = data.allowedTopics || [];
       allowedTopicsInput.value = topics.join(', ');
       updateTopicDisplay(topics);
@@ -74,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Save settings
   saveBtn.addEventListener('click', () => {
-    const hfApiKey = hfApiKeyInput.value.trim();
     const topicsText = allowedTopicsInput.value.trim();
     const topics = topicsText
       .split(/[,\n]/)
@@ -82,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
       .filter(topic => topic.length > 0);
     
     const settings = {
-      hfApiKey,
       allowedTopics: topics,
       strictMode: strictModeCheckbox.checked,
       extensionEnabled: enableExtensionCheckbox.checked,
@@ -104,7 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
           extensionEnabled: true,
           strictMode: true,
           allowedTopics: [],
-          hfApiKey: '',
           dailyStats: { blocked: 0, allowed: 0, date: new Date().toDateString() },
           totalStats: { blocked: 0, allowed: 0 },
           streak: 0
