@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 300px;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      margin: 0;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .header h1 {
+      margin: 0;
+      font-size: 18px;
+      color: #333;
+    }
+    
+    .status {
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    
+    .status.active {
+      background: #e8f5e8;
+      color: #2e7d32;
+      border: 1px solid #c8e6c9;
+    }
+    
+    .status.inactive {
+      background: #fff3e0;
+      color: #ef6c00;
+      border: 1px solid #ffcc02;
+    }
+    
+    .quick-actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .quick-actions button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .btn-primary {
+      background: #1976d2;
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: #666;
+      color: white;
+    }
+    
+    .btn-danger {
+      background: #d32f2f;
+      color: white;
+    }
+    
+    .stats {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
+    
+    .stats h3 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      color: #333;
+    }
+    
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
+    
+    .topics-list {
+      max-height: 100px;
+      overflow-y: auto;
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .footer {
+      text-align: center;
+      font-size: 11px;
+      color: #999;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎯 RemoveTube</h1>
+  </div>
+  
+  <div id="status" class="status">
+    Loading...
+  </div>
+  
+  <div class="quick-actions">
+    <button id="toggleBtn" class="btn-primary">Toggle</button>
+    <button id="settingsBtn" class="btn-secondary">Settings</button>
+  </div>
+  
+  <div class="stats">
+    <h3>📊 Today's Stats</h3>
+    <div class="stat-item">
+      <span>Videos Blocked:</span>
+      <span id="blockedCount">0</span>
+    </div>
+    <div class="stat-item">
+      <span>Videos Allowed:</span>
+      <span id="allowedCount">0</span>
+    </div>
+  </div>
+  
+  <div class="stats">
+    <h3>✅ Allowed Topics</h3>
+    <div id="topicsList" class="topics-list">
+      No topics set
+    </div>
+  </div>
+  
+  <div class="footer">
+    Stay focused, stay productive!
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
