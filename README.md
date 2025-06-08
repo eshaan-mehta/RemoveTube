@@ -1,2 +1,2 @@
 # RemoveTube
-Chrome Extension to block youtube videos that make you procrastinate.
+Chrome Extension to block YouTube videos that make you procrastinate.
