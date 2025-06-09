@@ -9,32 +9,33 @@
   ],
   
   "host_permissions": [
-    "*://*.youtube.com/*"
+    "*://*.youtube.com/*",
+    "http://localhost:8001/*"
   ],
   
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],
-      "js": ["lib/transformers.min.js", "js/ai-classifier.js", "js/content.js"],
+      "js": ["ai-classifier.js", "content.js"],
       "run_at": "document_start",
       "all_frames": false
     }
   ],
   
   "background": {
-    "service_worker": "js/background.js"
+    "service_worker": "background.js"
   },
   
   "action": {
-    "default_popup": "html/popup.html",
+    "default_popup": "popup.html",
     "default_title": "RemoveTube Settings"
   },
   
-  "options_page": "html/options.html",
+  "options_page": "options.html",
   
   "web_accessible_resources": [
     {
-      "resources": ["lib/transformers.min.js", "js/ai-classifier.js"],
+      "resources": ["ai-classifier.js"],
       "matches": ["*://*.youtube.com/*"]
     }
   ]

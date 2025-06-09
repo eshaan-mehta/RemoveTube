@@ -50,6 +50,62 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       console.error('Error opening options page:', error);
       sendResponse({ success: false, error: error.message });
     }
+    return true; // Keep message channel open for async response
+  }
+  
+  // Handle session storage operations
+  else if (request.action === 'setSessionStorage') {
+    try {
+      chrome.storage.session.set(request.data, () => {
+        if (chrome.runtime.lastError) {
+          console.error('Error setting session storage:', chrome.runtime.lastError.message);
+          sendResponse({ success: false, error: chrome.runtime.lastError.message });
+        } else {
+          console.log('Session storage set successfully:', request.data);
+          sendResponse({ success: true });
+        }
+      });
+    } catch (error) {
+      console.error('Error accessing session storage:', error);
+      sendResponse({ success: false, error: error.message });
+    }
+    return true; // Keep message channel open for async response
+  }
+  
+  else if (request.action === 'getSessionStorage') {
+    try {
+      chrome.storage.session.get(request.keys, (data) => {
+        if (chrome.runtime.lastError) {
+          console.error('Error getting session storage:', chrome.runtime.lastError.message);
+          sendResponse({ success: false, error: chrome.runtime.lastError.message });
+        } else {
+          console.log('Session storage retrieved:', data);
+          sendResponse({ success: true, data: data });
+        }
+      });
+    } catch (error) {
+      console.error('Error accessing session storage:', error);
+      sendResponse({ success: false, error: error.message });
+    }
+    return true; // Keep message channel open for async response
+  }
+  
+  else if (request.action === 'clearSessionStorage') {
+    try {
+      chrome.storage.session.clear(() => {
+        if (chrome.runtime.lastError) {
+          console.error('Error clearing session storage:', chrome.runtime.lastError.message);
+          sendResponse({ success: false, error: chrome.runtime.lastError.message });
+        } else {
+          console.log('Session storage cleared successfully');
+          sendResponse({ success: true });
+        }
+      });
+    } catch (error) {
+      console.error('Error clearing session storage:', error);
+      sendResponse({ success: false, error: error.message });
+    }
+    return true; // Keep message channel open for async response
   }
   
   // Return true to indicate we will send a response asynchronously

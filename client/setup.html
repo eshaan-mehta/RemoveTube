@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RemoveTube AI Setup</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .topic-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .topic-input input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .topic-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #edf2f7;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        .topic-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .topic-tag {
+            background: #edf2f7;
+            color: #4a5568;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .topic-tag .remove {
+            background: #f56565;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .suggested-topics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .suggested-topic {
+            padding: 10px 15px;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .suggested-topic:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+
+        .suggested-topic.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .status.info {
+            background: #ebf8ff;
+            color: #2b6cb0;
+            border: 1px solid #bee3f8;
+        }
+
+        .status.success {
+            background: #f0fff4;
+            color: #276749;
+            border: 1px solid #9ae6b4;
+        }
+
+        .status.error {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .progress {
+            background: #edf2f7;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 20px;
+            border-radius: 10px;
+            transition: width 0.3s;
+            position: relative;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .test-section {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .test-result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+        }
+
+        .test-result.pass {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            color: #276749;
+        }
+
+        .test-result.fail {
+            background: #fed7d7;
+            border: 1px solid #feb2b2;
+            color: #c53030;
+        }
+
+        .server-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #f56565;
+        }
+
+        .status-indicator.healthy {
+            background: #48bb78;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 RemoveTube AI Setup</h1>
+        <p class="subtitle">Configure your AI-powered content filtering</p>
+
+        <!-- Server Status -->
+        <div class="section">
+            <div class="server-status">
+                <div class="status-indicator" id="serverIndicator"></div>
+                <span id="serverStatus">Checking server connection...</span>
+            </div>
+        </div>
+
+        <!-- Step 1: Topic Selection -->
+        <div class="section">
+            <h2>📋 Step 1: Select Your Topics</h2>
+            <p>Choose the topics you want to see on YouTube. Content not matching these topics will be blocked.</p>
+            
+            <div class="suggested-topics" id="suggestedTopics">
+                <!-- Populated by JavaScript -->
+            </div>
+            
+            <div class="topic-input">
+                <input type="text" id="customTopic" placeholder="Add custom topic..." maxlength="50">
+                <button class="btn btn-secondary" onclick="addCustomTopic()">Add Topic</button>
+            </div>
+            
+            <div class="topic-list" id="selectedTopics">
+                <!-- Selected topics will appear here -->
+            </div>
+        </div>
+
+        <!-- Step 2: Setup Embeddings -->
+        <div class="section">
+            <h2>⚡ Step 2: Initialize AI Classifier</h2>
+            <p>Generate vector embeddings for your topics to enable fast, accurate classification.</p>
+            
+            <div class="progress" id="setupProgress" style="display: none;">
+                <div class="progress-bar" id="progressBar" style="width: 0%;">
+                    <div class="progress-text" id="progressText">0%</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" id="setupBtn" onclick="setupEmbeddings()">
+                🚀 Setup AI Classifier
+            </button>
+            
+            <div id="setupStatus"></div>
+        </div>
+
+        <!-- Step 3: Test the Classifier -->
+        <div class="section">
+            <h2>🧪 Step 3: Test Your Configuration</h2>
+            <p>Verify that the AI correctly identifies content. The brownies test should be <strong>BLOCKED</strong> for programming topics.</p>
+            
+            <div class="test-section">
+                <button class="btn btn-success" onclick="runBrowniesTest()">
+                    🍰 Run Brownies Test
+                </button>
+                <div id="testResult"></div>
+            </div>
+        </div>
+
+        <!-- Final Status -->
+        <div class="section">
+            <h2>✅ Setup Complete</h2>
+            <p>Your AI classifier is ready! You can now browse YouTube with intelligent content filtering.</p>
+            
+            <div class="status info" id="finalStatus" style="display: none;">
+                <strong>Ready to use!</strong> The extension will now use AI to filter content based on your topics.
+            </div>
+        </div>
+    </div>
+
+    <script src="ai-classifier.js"></script>
+    <script>
+        const suggestedTopicsList = [
+            'Programming', 'Technology', 'Science', 'Education', 'Learning',
+            'Web Development', 'Data Science', 'AI & Machine Learning', 'Cybersecurity',
+            'Business', 'Entrepreneurship', 'Finance', 'Marketing',
+            'Health & Fitness', 'Cooking', 'Travel', 'Music', 'Art',
+            'Gaming', 'Sports', 'News', 'Documentary', 'Comedy'
+        ];
+
+        let selectedTopics = new Set();
+
+        // Initialize the page
+        async function init() {
+            renderSuggestedTopics();
+            await checkServerStatus();
+            loadExistingTopics();
+        }
+
+        // Render suggested topics
+        function renderSuggestedTopics() {
+            const container = document.getElementById('suggestedTopics');
+            container.innerHTML = '';
+            
+            suggestedTopicsList.forEach(topic => {
+                const element = document.createElement('div');
+                element.className = 'suggested-topic';
+                element.textContent = topic;
+                element.onclick = () => toggleSuggestedTopic(topic, element);
+                container.appendChild(element);
+            });
+        }
+
+        // Toggle suggested topic selection
+        function toggleSuggestedTopic(topic, element) {
+            if (selectedTopics.has(topic)) {
+                selectedTopics.delete(topic);
+                element.classList.remove('selected');
+            } else {
+                selectedTopics.add(topic);
+                element.classList.add('selected');
+            }
+            renderSelectedTopics();
+        }
+
+        // Add custom topic
+        function addCustomTopic() {
+            const input = document.getElementById('customTopic');
+            const topic = input.value.trim();
+            
+            if (topic && !selectedTopics.has(topic)) {
+                selectedTopics.add(topic);
+                input.value = '';
+                renderSelectedTopics();
+            }
+        }
+
+        // Handle Enter key in custom topic input
+        document.getElementById('customTopic').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addCustomTopic();
+            }
+        });
+
+        // Render selected topics
+        function renderSelectedTopics() {
+            const container = document.getElementById('selectedTopics');
+            container.innerHTML = '';
+            
+            selectedTopics.forEach(topic => {
+                const element = document.createElement('div');
+                element.className = 'topic-tag';
+                element.innerHTML = `
+                    <span>${topic}</span>
+                    <div class="remove" onclick="removeTopic('${topic}')">&times;</div>
+                `;
+                container.appendChild(element);
+            });
+        }
+
+        // Remove topic
+        function removeTopic(topic) {
+            selectedTopics.delete(topic);
+            renderSelectedTopics();
+            
+            // Update suggested topics display
+            const suggestedElements = document.querySelectorAll('.suggested-topic');
+            suggestedElements.forEach(el => {
+                if (el.textContent === topic) {
+                    el.classList.remove('selected');
+                }
+            });
+        }
+
+        // Check server status
+        async function checkServerStatus() {
+            const indicator = document.getElementById('serverIndicator');
+            const status = document.getElementById('serverStatus');
+            
+            try {
+                const isHealthy = await window.aiClassifier.checkServerHealth();
+                
+                if (isHealthy) {
+                    indicator.classList.add('healthy');
+                    status.textContent = 'Server connected ✅';
+                    status.style.color = '#276749';
+                } else {
+                    throw new Error('Server not healthy');
+                }
+            } catch (error) {
+                indicator.classList.remove('healthy');
+                status.textContent = 'Server not available ❌ (Make sure server is running on localhost:8000)';
+                status.style.color = '#c53030';
+            }
+        }
+
+        // Load existing topics from storage
+        async function loadExistingTopics() {
+            try {
+                const stored = await window.aiClassifier._loadStoredEmbeddings();
+                if (stored && stored.topics) {
+                    stored.topics.forEach(topic => {
+                        selectedTopics.add(topic);
+                    });
+                    renderSelectedTopics();
+                    
+                    // Update suggested topics display
+                    const suggestedElements = document.querySelectorAll('.suggested-topic');
+                    suggestedElements.forEach(el => {
+                        if (selectedTopics.has(el.textContent)) {
+                            el.classList.add('selected');
+                        }
+                    });
+                    
+                    showStatus('info', 'Loaded existing topic configuration');
+                    document.getElementById('finalStatus').style.display = 'block';
+                }
+            } catch (error) {
+                console.log('No existing configuration found');
+            }
+        }
+
+        // Setup embeddings
+        async function setupEmbeddings() {
+            if (selectedTopics.size === 0) {
+                showStatus('error', 'Please select at least one topic first!');
+                return;
+            }
+
+            const setupBtn = document.getElementById('setupBtn');
+            const progress = document.getElementById('setupProgress');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            setupBtn.disabled = true;
+            setupBtn.textContent = 'Setting up...';
+            setupBtn.classList.add('loading');
+            
+            progress.style.display = 'block';
+            updateProgress(20, 'Connecting to server...');
+            
+            try {
+                updateProgress(40, 'Generating embeddings...');
+                
+                const topics = Array.from(selectedTopics);
+                await window.aiClassifier.setupTopics(topics);
+                
+                updateProgress(80, 'Storing embeddings...');
+                
+                // Small delay to show completion
+                setTimeout(() => {
+                    updateProgress(100, 'Complete!');
+                    showStatus('success', `✅ Successfully configured ${topics.length} topics with AI embeddings!`);
+                    document.getElementById('finalStatus').style.display = 'block';
+                    
+                    setupBtn.textContent = '✅ Setup Complete';
+                    setupBtn.classList.remove('loading');
+                    setupBtn.classList.remove('btn-primary');
+                    setupBtn.classList.add('btn-success');
+                }, 500);
+                
+            } catch (error) {
+                console.error('Setup failed:', error);
+                showStatus('error', `❌ Setup failed: ${error.message}`);
+                
+                setupBtn.disabled = false;
+                setupBtn.textContent = '🚀 Setup AI Classifier';
+                setupBtn.classList.remove('loading');
+                
+                progress.style.display = 'none';
+            }
+        }
+
+        // Update progress bar
+        function updateProgress(percent, text) {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            progressBar.style.width = percent + '%';
+            progressText.textContent = text;
+        }
+
+        // Run brownies test
+        async function runBrowniesTest() {
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.innerHTML = '<div class="loading">Running test...</div>';
+            
+            try {
+                const testResult = await window.aiClassifier.testBrowniesCase();
+                
+                const resultClass = testResult.passed ? 'pass' : 'fail';
+                const resultIcon = testResult.passed ? '✅' : '❌';
+                
+                resultDiv.innerHTML = `
+                    <div class="test-result ${resultClass}">
+                        <strong>${resultIcon} Brownies Test: ${testResult.passed ? 'PASSED' : 'FAILED'}</strong><br>
+                        Expected: BLOCKED (false)<br>
+                        Got: ${testResult.actual ? 'ALLOWED (true)' : 'BLOCKED (false)'}<br>
+                        ${testResult.result ? `
+                            Topic: ${testResult.result.topic}<br>
+                            Confidence: ${testResult.result.confidence.toFixed(3)}<br>
+                            Method: ${testResult.result.method || 'N/A'}
+                        ` : ''}
+                        ${testResult.error ? `<br>Error: ${testResult.error}` : ''}
+                    </div>
+                `;
+                
+                if (testResult.passed) {
+                    showStatus('success', '🎉 Your AI classifier is working correctly!');
+                } else {
+                    showStatus('error', '⚠️ The classifier may need adjustment. Check server configuration.');
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result fail">
+                        <strong>❌ Test Error</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Show status message
+        function showStatus(type, message) {
+            const statusDiv = document.getElementById('setupStatus');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

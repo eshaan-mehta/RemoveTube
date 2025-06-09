@@ -83,9 +83,18 @@ document.addEventListener('DOMContentLoaded', () => {
       isSetupComplete: true
     };
 
-    chrome.storage.sync.set(settings, () => {
+    chrome.storage.sync.set(settings, async () => {
       updateTopicDisplay(topics);
-      showStatus('✅ Settings saved successfully!');
+      
+      // Setup topics on the AI server
+      try {
+        showStatus('🧠 Setting up AI server...');
+        await window.aiClassifier.setupTopics(topics);
+        showStatus('✅ Settings saved and AI server configured!');
+      } catch (serverError) {
+        console.warn('Server setup failed:', serverError);
+        showStatus('⚠️ Settings saved but server setup failed. Extension will use fallback mode.');
+      }
     });
   });
 
@@ -167,6 +176,36 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Check server status
+  async function checkServerStatus() {
+    const statusElement = document.getElementById('serverStatusText');
+    const statusContainer = document.getElementById('serverStatus');
+    
+    if (!statusElement || !statusContainer) return;
+    
+    try {
+      const response = await fetch('http://localhost:8001/health');
+      if (response.ok) {
+        const health = await response.json();
+        if (health.status === 'healthy') {
+          statusElement.textContent = '✅ Online and Ready';
+          statusContainer.style.backgroundColor = '#e8f5e8';
+          statusContainer.style.color = '#2e7d32';
+        } else {
+          statusElement.textContent = '⚠️ Server Issues';
+          statusContainer.style.backgroundColor = '#fff3e0';
+          statusContainer.style.color = '#f57c00';
+        }
+      } else {
+        throw new Error('Server not responding');
+      }
+    } catch (error) {
+      statusElement.textContent = '❌ Offline (Extension will use fallback)';
+      statusContainer.style.backgroundColor = '#ffebee';
+      statusContainer.style.color = '#c62828';
+    }
+  }
+
   // Auto-update topic display as user types
   allowedTopicsInput.addEventListener('input', () => {
     const topics = allowedTopicsInput.value
@@ -178,4 +217,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Load initial settings
   loadSettings();
+  
+  // Check server status on page load
+  checkServerStatus();
+  
+  // Recheck server status every 30 seconds
+  setInterval(checkServerStatus, 30000);
 });

@@ -5,69 +5,70 @@ RemoveTube helps you stay focused and productive on YouTube by filtering content
 ## ✨ Features
 
 - **Smart Content Filtering**: Automatically blocks YouTube videos that don't match your allowed topics
-- **Browser-Based AI**: Uses cutting-edge AI models that run directly in your browser - no API keys needed!
-- **Advanced Classification**: Multiple AI methods including zero-shot classification and semantic similarity
-- **Privacy First**: All AI processing happens locally - your data never leaves your browser
+- **Server-Based AI**: Uses cutting-edge AI models running on a local server for maximum accuracy!
+- **Advanced Classification**: Semantic similarity matching using sentence-transformers
+- **Privacy First**: All AI processing happens on your local machine - no external API calls
 - **Customizable Topics**: Set your own allowed content categories
 - **Flexible Modes**: Choose between strict and relaxed filtering
 - **Usage Statistics**: Track your productivity with daily stats
-- **Easy Setup**: One-time configuration with an intuitive interface
+- **Easy Setup**: Session-based configuration that appears every time you visit YouTube
 
 ## 🚀 How It Works
 
-1. **Initial Setup**: When you first visit YouTube, you'll be prompted to set up your allowed content topics
-2. **Content Analysis**: Each video you try to watch is analyzed against your allowed topics
+1. **Initial Setup**: When you visit YouTube, you'll be prompted to set up your allowed content topics
+2. **Content Analysis**: Each video you try to watch is analyzed by the AI server against your allowed topics
 3. **Smart Blocking**: Videos that don't match are blocked with a helpful explanation
-4. **Productivity Boost**: Stay focused on content that aligns with your goals
+4. **Session-Based**: Your topics are saved only for the current session and cleared when you leave YouTube
 
 ## 📋 Installation
 
-### Option 1: Load as Unpacked Extension (Developer Mode)
+### Prerequisites
+
+1. **Start the AI Server**: 
+   ```bash
+   cd RemoveTube/server
+   pip install -r requirements.txt
+   python -m uvicorn main:app --host 0.0.0.0 --port 8001
+   ```
+
+### Install the Extension
 
 1. Clone or download this repository
 2. Open Chrome and go to `chrome://extensions/`
 3. Enable "Developer mode" in the top right
 4. Click "Load unpacked" and select the `client` folder
 5. The extension will appear in your browser toolbar
-
-### Option 2: Build for Production
-
-```bash
-# Navigate to the project directory
-cd RemoveTube/client
-
-# The extension is ready to use as-is, no build step required
-```
+6. Navigate to YouTube.com to start the setup process
 
 ## ⚙️ Configuration
 
 ### Setting Up Your Allowed Topics
 
-1. Click the RemoveTube extension icon in your toolbar
-2. Click "Settings" or complete the initial setup
-3. Add your allowed topics (comma-separated):
+1. Navigate to YouTube.com - the setup wizard will appear automatically
+2. Add your allowed topics (comma-separated):
    - Examples: `education, programming, music, cooking, fitness`
-   - Use preset buttons for quick setup
-4. Enjoy advanced AI-powered filtering that works completely offline!
+3. Choose your filtering strictness
+4. Enjoy advanced AI-powered filtering with server-based accuracy!
 
-### Browser-Based AI Processing
+### Server-Based AI Processing
 
-RemoveTube now uses state-of-the-art AI models that run directly in your browser:
+RemoveTube uses advanced AI models running on a local server:
 
-- **Zero-Shot Classification**: Uses DistilBERT for understanding content context
-- **Semantic Similarity**: Uses all-MiniLM-L6-v2 for finding topic relationships  
-- **Hierarchical Analysis**: Smart two-stage classification for better accuracy
-- **Complete Privacy**: All AI processing happens locally - no data sent to external servers
-- **No Setup Required**: No API keys, accounts, or configuration needed!
+- **Sentence Transformers**: Uses all-MiniLM-L6-v2 for semantic understanding
+- **Vector Embeddings**: Creates high-quality embeddings for content and topics
+- **Cosine Similarity**: Accurate similarity matching between content and allowed topics
+- **Local Processing**: Runs on your machine - no external API calls
+- **Fast Response**: ~50ms classification time for quick filtering
 
 ## 🛠️ How to Use
 
 ### Basic Usage
 
-1. **Setup**: Configure your allowed topics when prompted
+1. **Setup**: Configure your allowed topics when you visit YouTube (session-based)
 2. **Browse**: Use YouTube normally
 3. **Filtering**: Videos not matching your topics will be automatically blocked
-4. **Override**: Use the extension popup to temporarily disable filtering if needed
+4. **Session**: Topics are saved only for your current YouTube session
+5. **Override**: Use debug functions in console if needed for testing
 
 ### Managing Settings
 
@@ -90,23 +91,23 @@ Choose from predefined topic sets:
 
 ### Content Analysis Methods
 
-1. **Browser-Based AI Classification**:
-   - Uses DistilBERT and all-MiniLM-L6-v2 models via Transformers.js
-   - Hierarchical classification: title first, then full content
-   - Semantic similarity matching for better topic understanding
-   - Runs completely offline in your browser
+1. **Server-Based AI Classification**:
+   - Uses sentence-transformers/all-MiniLM-L6-v2 for semantic understanding
+   - Vector embedding similarity matching
+   - Fast and accurate classification (~50ms response time)
+   - Runs on local server for privacy
 
 2. **Keyword Matching** (fallback):
    - Simple but effective keyword-based filtering
-   - Automatic fallback if AI models fail to load
+   - Automatic fallback if AI server is unavailable
    - Matches topics against video titles and descriptions
 
 ### Privacy & Security
 
-- **Complete Privacy**: All AI processing happens in your browser - no external API calls
-- **Local Storage**: All settings stored locally in Chrome's storage
+- **Local Processing**: All AI processing happens on your local server - no external API calls
+- **Session Storage**: Topics stored only in browser session storage (cleared when leaving YouTube)
 - **No Data Collection**: Extension doesn't collect, store, or transmit any personal data
-- **Offline Operation**: Works completely offline once models are loaded
+- **Local Server**: AI models run on your machine for complete privacy
 - **Open Source**: Full source code available for transparency
 
 ## 📊 Statistics & Insights
@@ -142,23 +143,28 @@ Track your productivity with built-in statistics:
 - Ensure you've completed the initial setup
 
 **Videos not being blocked:**
-- Verify your allowed topics are set correctly
+- Verify your allowed topics are set correctly in the session
 - Check if strict mode is enabled for more aggressive filtering
 - Try adding more specific keywords for your allowed content
-- Wait for AI models to load on first use (may take a moment)
+- Ensure the AI server is running on localhost:8001
 
-**AI models not loading:**
-- Ensure you have a stable internet connection for initial model download
-- Check browser console for any error messages
-- Try refreshing the page if models fail to load
-- Extension will automatically fall back to keyword matching if AI fails
+**AI server not working:**
+- Check that the server is running: `curl http://localhost:8001/health`
+- Restart the server: `python -m uvicorn main:app --host 0.0.0.0 --port 8001`
+- Check browser console for connection error messages
+- Extension will automatically fall back to keyword matching if server fails
+
+**Setup wizard not appearing:**
+- Clear session storage using: `clearRemoveTubeStorage()` in browser console
+- Refresh the YouTube page
+- Check that you're on the YouTube homepage
 
 ### Performance Tips
 
 - **Topic Optimization**: Use 3-7 well-chosen topics for best results
-- **First Load**: AI models download on first use - subsequent loads are instant
+- **Server Performance**: FastAPI server provides ~50ms response times
 - **Browser Performance**: Extension is optimized for minimal resource usage
-- **Model Caching**: AI models are cached locally for fast repeated use
+- **Session Storage**: Topics cleared automatically when leaving YouTube
 
 ## 🤝 Contributing
 
@@ -174,10 +180,16 @@ We welcome contributions! Here's how you can help:
 ```bash
 # Clone the repository
 git clone https://github.com/yourusername/RemoveTube.git
-cd RemoveTube/client
+cd RemoveTube
 
-# Load in Chrome as unpacked extension
-# Make changes and reload extension for testing
+# Start the AI server
+cd server
+pip install -r requirements.txt
+python -m uvicorn main:app --host 0.0.0.0 --port 8001
+
+# Load extension in Chrome
+# Open chrome://extensions/, enable Developer mode
+# Click "Load unpacked" and select the client/ folder
 ```
 
 ## 📄 License
@@ -186,8 +198,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **Transformers.js**: For enabling browser-based AI with excellent models
-- **Hugging Face**: For providing the DistilBERT and all-MiniLM-L6-v2 models
+- **FastAPI**: For providing an excellent web framework for the AI server
+- **sentence-transformers**: For the all-MiniLM-L6-v2 model enabling semantic understanding
+- **scikit-learn**: For cosine similarity calculations
 - **Chrome Extension APIs**: For enabling seamless browser integration
 - **Open Source Community**: For inspiration and best practices
 

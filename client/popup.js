@@ -14,11 +14,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       'isSetupComplete', 
       'extensionEnabled', 
       'dailyStats'
-    ], (data) => {
+    ], async (data) => {
       const topics = data.allowedTopics || [];
       const isSetup = data.isSetupComplete || false;
       const isEnabled = data.extensionEnabled !== false; // default to true
       const stats = data.dailyStats || { blocked: 0, allowed: 0, date: new Date().toDateString() };
+
+      // Check server status
+      let serverStatus = 'Unknown';
+      try {
+        const response = await fetch('http://localhost:8001/health');
+        if (response.ok) {
+          const health = await response.json();
+          serverStatus = health.status === 'healthy' ? '✅ Online' : '⚠️ Issues';
+        } else {
+          serverStatus = '❌ Offline';
+        }
+      } catch (error) {
+        serverStatus = '❌ Offline';
+      }
 
       // Update status
       if (!isSetup) {
@@ -34,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         statusDiv.className = 'status inactive';
         toggleBtn.textContent = 'Setup';
       } else {
-        statusDiv.textContent = '✅ Active & Protecting';
+        statusDiv.textContent = `✅ Active & Protecting (Server: ${serverStatus})`;
         statusDiv.className = 'status active';
         toggleBtn.textContent = 'Disable';
       }

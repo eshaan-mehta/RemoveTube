@@ -12,19 +12,22 @@
     </div>
 
     <div class="section ai-section">
-      <h2>🧠 Browser-Based AI Filtering</h2>
+      <h2>🧠 Server-Based AI Filtering</h2>
       <div class="ai-info-card">
-        <h3>Powered by Local AI Models</h3>
-        <p>RemoveTube uses advanced AI models that run directly in your browser:</p>
+        <h3>Powered by Server-Based AI</h3>
+        <p>RemoveTube uses advanced AI models running on a local server:</p>
         <ul>
-          <li>✅ <strong>Privacy First:</strong> No data leaves your browser</li>
-          <li>✅ <strong>No API Keys:</strong> Works instantly without setup</li>
-          <li>✅ <strong>Smart Classification:</strong> Advanced content understanding</li>
-          <li>✅ <strong>Fast & Reliable:</strong> Instant analysis, no network delays</li>
+          <li>✅ <strong>High Accuracy:</strong> State-of-the-art semantic understanding</li>
+          <li>✅ <strong>Fast Performance:</strong> ~50ms response time</li>
+          <li>✅ <strong>Privacy First:</strong> Runs locally on your machine</li>
+          <li>✅ <strong>Reliable:</strong> Consistent, high-quality filtering</li>
         </ul>
         <p style="margin-top: 15px; font-size: 13px; opacity: 0.9;">
-          <strong>Models:</strong> Uses DistilBERT for zero-shot classification and MiniLM for semantic similarity
+          <strong>Model:</strong> Uses sentence-transformers/all-MiniLM-L6-v2 for vector embeddings
         </p>
+        <div id="serverStatus" style="margin-top: 10px; padding: 8px; border-radius: 4px; font-size: 12px;">
+          <strong>Server Status:</strong> <span id="serverStatusText">Checking...</span>
+        </div>
       </div>
     </div>
 
