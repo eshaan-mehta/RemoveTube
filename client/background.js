@@ -55,6 +55,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   
   // Handle session storage operations
   else if (request.action === 'setSessionStorage') {
+    console.log('Background: Setting session storage:', request.data);
     try {
       chrome.storage.session.set(request.data, () => {
         if (chrome.runtime.lastError) {
@@ -73,6 +74,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   
   else if (request.action === 'getSessionStorage') {
+    console.log('Background: Getting session storage for keys:', request.keys);
     try {
       chrome.storage.session.get(request.keys, (data) => {
         if (chrome.runtime.lastError) {
@@ -91,6 +93,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   
   else if (request.action === 'clearSessionStorage') {
+    console.log('Background: Clearing session storage');
     try {
       chrome.storage.session.clear(() => {
         if (chrome.runtime.lastError) {

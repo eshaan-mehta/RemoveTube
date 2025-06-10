@@ -13,63 +13,20 @@
   function loadSettings() {
     return new Promise((resolve) => {
       try {
-        // Don't access storage if we're in blocked video state
-        if (isVideoBlocked) {
-          console.log('RemoveTube: Skipping storage access in blocked video state');
-          resolve(false);
-          return;
-        }
-
-        // Check if chrome extension context is still valid
-        if (!chrome || !chrome.runtime) {
-          console.warn('RemoveTube: Chrome extension context invalidated, using default settings');
-          allowedTopics = [];
-          strictMode = true;
-          resolve(false);
-          return;
-        }
-
-        // First check session storage for current session topics via background script
-        chrome.runtime.sendMessage({
-          action: 'getSessionStorage',
-          keys: ['sessionTopics', 'sessionStrictMode']
-        }, (response) => {
+        chrome.storage.sync.get(['allowedTopics', 'strictMode', 'isSetupComplete'], (data) => {
           if (chrome.runtime.lastError) {
-            console.warn('RemoveTube: Session storage error:', chrome.runtime.lastError.message);
-            // Fallback to empty session
+            console.warn('RemoveTube: Error loading settings:', chrome.runtime.lastError.message);
             allowedTopics = [];
             strictMode = true;
             resolve(false);
             return;
           }
-
-          if (!response || !response.success) {
-            console.warn('RemoveTube: Failed to get session storage:', response?.error);
-            allowedTopics = [];
-            strictMode = true;
-            resolve(false);
-            return;
-          }
-
-          const sessionData = response.data;
-          const hasSessionTopics = sessionData.sessionTopics && sessionData.sessionTopics.length > 0;
-          
-          if (hasSessionTopics) {
-            // Use session data if available
-            allowedTopics = sessionData.sessionTopics;
-            strictMode = sessionData.sessionStrictMode !== false;
-            console.log('RemoveTube: Loaded session topics:', allowedTopics);
-            resolve(true);
-          } else {
-            // No session topics - this means setup is needed
-            allowedTopics = [];
-            strictMode = true;
-            console.log('RemoveTube: No session topics found, setup required');
-            resolve(false);
-          }
+          allowedTopics = data.allowedTopics || [];
+          strictMode = data.strictMode !== false;
+          resolve(data.isSetupComplete === true);
         });
       } catch (error) {
-        console.warn('RemoveTube: Error loading settings, extension context may be invalidated:', error);
+        console.warn('RemoveTube: Error loading settings:', error);
         allowedTopics = [];
         strictMode = true;
         resolve(false);
@@ -380,46 +337,45 @@
                 throw new Error('Chrome extension context is not available');
               }
 
-              chrome.runtime.sendMessage({
-                action: 'setSessionStorage',
-                data: sessionData
-              }, async (response) => {
+              chrome.storage.sync.set({
+                allowedTopics: topics,
+                strictMode: strict,
+                isSetupComplete: true
+              }, async () => {
                 if (chrome.runtime.lastError) {
-                  console.error('RemoveTube: Error saving session settings:', chrome.runtime.lastError.message);
+                  console.error('RemoveTube: Error saving settings:', chrome.runtime.lastError.message);
                   alert('Error saving settings: ' + chrome.runtime.lastError.message + '. Please try again.');
                   // Reset button state
                   saveButton.textContent = originalText;
                   saveButton.disabled = false;
                   return;
                 }
-
-                if (!response || !response.success) {
-                  console.error('RemoveTube: Failed to save session settings:', response?.error);
-                  alert('Error saving settings: ' + (response?.error || 'Unknown error') + '. Please try again.');
-                  // Reset button state
-                  saveButton.textContent = originalText;
-                  saveButton.disabled = false;
-                  return;
+                console.log('Settings saved successfully, setting up AI server...');
+                // Setup topics on the AI server
+                try {
+                  saveButton.textContent = '🧠 Setting up AI...';
+                  await window.aiClassifier.setupTopics(topics);
+                  console.log('AI server setup complete');
+                } catch (serverError) {
+                  console.warn('Server setup failed, will use fallback:', serverError);
+                  // Don't fail the entire setup if server is unavailable
                 }
-                
-                console.log('Session settings saved successfully, setting up AI server...');
-                
                 // Cleanup overlay
                 try {
                   overlay.remove();
                   style.remove();
                   document.body.classList.remove('removetube-overlay-active');
-                } catch (cleanupError) {
-                  console.warn('Error during overlay cleanup:', cleanupError);
-                }
-                
-                // Reload settings to confirm they were saved
-                loadSettings().then((isComplete) => {
-                  console.log('RemoveTube setup complete! Settings reloaded:', isComplete);
-                  // Start checking videos after setup
+                  allowedTopics = topics;
+                  strictMode = strict;
                   if (window.location.pathname.includes('/watch')) {
                     setTimeout(() => checkCurrentVideo(), 1000);
                   }
+                } catch (cleanupError) {
+                  console.warn('Error during overlay cleanup:', cleanupError);
+                }
+                // Reload settings to confirm they were saved
+                loadSettings().then((isComplete) => {
+                  console.log('RemoveTube setup complete! Settings reloaded:', isComplete);
                 }).catch((error) => {
                   console.error('RemoveTube: Error loading settings after setup:', error);
                 });
@@ -1523,20 +1479,11 @@
 
   // Clean up session storage when leaving YouTube
   window.addEventListener('beforeunload', () => {
-    console.log('RemoveTube: User leaving YouTube, clearing session storage');
-    try {
-      if (chrome && chrome.runtime) {
-        chrome.runtime.sendMessage({ action: 'clearSessionStorage' }, (response) => {
-          if (chrome.runtime.lastError) {
-            console.warn('RemoveTube: Error clearing session storage:', chrome.runtime.lastError.message);
-          } else if (response && response.success) {
-            console.log('RemoveTube: Session storage cleared');
-          }
-        });
-      }
-    } catch (error) {
-      console.warn('RemoveTube: Error accessing session storage for cleanup:', error);
+    if (window.location.hostname === 'www.youtube.com' || window.location.hostname === 'youtube.com') {
+      // Do nothing if still on YouTube
+      return;
     }
+    chrome.storage.sync.remove(['allowedTopics', 'strictMode', 'isSetupComplete']);
   });
 
   // Also clean up when navigating away from YouTube domain

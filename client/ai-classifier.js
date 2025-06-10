@@ -231,25 +231,16 @@ class AIClassifier {
    * Load stored embeddings - works with both extension context and page context
    */
   async _loadStoredEmbeddings() {
-    // Try session storage first (for session-based topics)
     try {
-      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
-        // Use message passing for content script context
-        return new Promise((resolve, reject) => {
-          chrome.runtime.sendMessage({
-            action: 'getSessionStorage',
-            keys: ['userTopics', 'userTopicEmbeddings']
-          }, (response) => {
-            if (chrome.runtime.lastError) {
-              reject(chrome.runtime.lastError);
-            } else {
-              resolve(response);
-            }
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
+        return await new Promise((resolve) => {
+          chrome.storage.sync.get(['userTopics', 'userTopicEmbeddings'], (data) => {
+            resolve({
+              userTopics: data.userTopics || [],
+              userTopicEmbeddings: data.userTopicEmbeddings || null
+            });
           });
         });
-      } else if (typeof chrome !== 'undefined' && chrome.storage) {
-        // Direct storage access for extension pages
-        return await chrome.storage.local.get(['userTopics', 'userTopicEmbeddings']);
       }
     } catch (error) {
       console.warn('RemoveTube: Could not access storage:', error);
@@ -302,28 +293,14 @@ class AIClassifier {
    */
   async _storeEmbeddings(topics, embeddings) {
     try {
-      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
-        // Use message passing for content script context (session storage)
-        return new Promise((resolve, reject) => {
-          chrome.runtime.sendMessage({
-            action: 'setSessionStorage',
-            data: {
-              userTopics: topics,
-              userTopicEmbeddings: embeddings
-            }
-          }, (response) => {
-            if (chrome.runtime.lastError) {
-              reject(chrome.runtime.lastError);
-            } else {
-              resolve(response);
-            }
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
+        return await new Promise((resolve) => {
+          chrome.storage.sync.set({
+            userTopics: topics,
+            userTopicEmbeddings: embeddings
+          }, () => {
+            resolve();
           });
-        });
-      } else if (typeof chrome !== 'undefined' && chrome.storage) {
-        // Direct storage access for extension pages
-        return await chrome.storage.local.set({
-          userTopics: topics,
-          userTopicEmbeddings: embeddings
         });
       }
     } catch (error) {

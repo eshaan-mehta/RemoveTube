@@ -397,6 +397,7 @@
                 element.classList.add('selected');
             }
             renderSelectedTopics();
+            saveTopicsToSession(); // Auto-save to session storage
         }
 
         // Add custom topic
@@ -408,6 +409,7 @@
                 selectedTopics.add(topic);
                 input.value = '';
                 renderSelectedTopics();
+                saveTopicsToSession(); // Auto-save to session storage
             }
         }
 
@@ -417,6 +419,27 @@
                 addCustomTopic();
             }
         });
+
+        // Save topics to session storage immediately
+        function saveTopicsToSession() {
+            const topics = Array.from(selectedTopics);
+            
+            if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+                chrome.runtime.sendMessage({
+                    action: 'setSessionStorage',
+                    data: {
+                        sessionTopics: topics,
+                        sessionStrictMode: true // Default to strict mode
+                    }
+                }, (response) => {
+                    if (chrome.runtime.lastError) {
+                        console.warn('Could not save topics to session:', chrome.runtime.lastError.message);
+                    } else {
+                        console.log('Topics auto-saved to session storage:', topics);
+                    }
+                });
+            }
+        }
 
         // Render selected topics
         function renderSelectedTopics() {
@@ -438,6 +461,7 @@
         function removeTopic(topic) {
             selectedTopics.delete(topic);
             renderSelectedTopics();
+            saveTopicsToSession(); // Auto-save to session storage
             
             // Update suggested topics display
             const suggestedElements = document.querySelectorAll('.suggested-topic');

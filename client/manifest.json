@@ -5,7 +5,8 @@
   "description": "AI-powered YouTube content filter to help you stay focused on your allowed topics",
   
   "permissions": [
-    "storage"
+    "storage",
+    "activeTab"
   ],
   
   "host_permissions": [
