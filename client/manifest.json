@@ -17,26 +17,26 @@
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],
-      "js": ["ai-classifier.js", "content.js"],
+      "js": ["scripts/classifier.js", "scripts/content.js"],
       "run_at": "document_start",
       "all_frames": false
     }
   ],
   
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "scripts/background.js"
   },
   
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "pages/popup.html",
     "default_title": "RemoveTube Settings"
   },
   
-  "options_page": "options.html",
+  "options_page": "pages/options.html",
   
   "web_accessible_resources": [
     {
-      "resources": ["ai-classifier.js"],
+      "resources": ["scripts/classifier.js"],
       "matches": ["*://*.youtube.com/*"]
     }
   ]

@@ -8,7 +8,6 @@ class AIClassifier {
     this.serverUrl = 'http://localhost:8001';
     this.isInitialized = false;
     this.userTopics = [];
-    this.userTopicEmbeddings = null;
   }
 
   /**
@@ -33,8 +32,6 @@ class AIClassifier {
     return false;
   }
 
-
-
   /**
    * Classify content using the server-based semantic model
    * @param {string} title - Video title
@@ -44,34 +41,27 @@ class AIClassifier {
    * @returns {Object} Classification result
    */
   async classifyContent(title, description = '', allowedTopics = null, strictMode = false) {
-    // Use stored topics if not provided
     if (!allowedTopics) {
-      const stored = await this._loadStoredEmbeddings();
-      if (stored && stored.userTopics && stored.userTopicEmbeddings) {
-        this.userTopics = stored.userTopics;
-        this.userTopicEmbeddings = stored.userTopicEmbeddings;
-        allowedTopics = this.userTopics;
-      } else {
-        return this._fallbackClassification(title, description, ['programming']);
+      allowedTopics = this.userTopics;
+      if (!allowedTopics || allowedTopics.length === 0) {
+        return this.fallbackToKeywordMatching(title, description, ['programming']);
       }
     }
 
-    // Try server-based classification first
     try {
-      const serverResult = await this._classifyWithServer(title, description, allowedTopics, strictMode);
+      const serverResult = await this.classifyWithServer(title, description, allowedTopics, strictMode);
       if (serverResult) return serverResult;
     } catch (error) {
       console.warn('RemoveTube: Server classification failed, using fallback:', error);
     }
 
-    // Fallback to keyword-based classification
-    return this._fallbackClassification(title, description, allowedTopics);
+    return this.fallbackToKeywordMatching(title, description, allowedTopics);
   }
 
   /**
    * Server-based classification using pre-computed embeddings
    */
-  async _classifyWithServer(title, description, topics, strictMode) {
+  async classifyWithServer(title, description, topics, strictMode) {
     try {
       // Use simple endpoint for easier testing and reliability
       const response = await fetch(`${this.serverUrl}/classify-simple`, {
@@ -160,7 +150,7 @@ class AIClassifier {
   /**
    * Fallback keyword-based classification when server is unavailable
    */
-  _fallbackClassification(title, description, allowedTopics) {
+  fallbackToKeywordMatching(title, description, allowedTopics) {
     const content = `${title} ${description}`.toLowerCase();
     
     // Simple keyword matching for emergency fallback
@@ -228,84 +218,11 @@ class AIClassifier {
   }
 
   /**
-   * Load stored embeddings - works with both extension context and page context
-   */
-  async _loadStoredEmbeddings() {
-    try {
-      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
-        return await new Promise((resolve) => {
-          chrome.storage.sync.get(['userTopics', 'userTopicEmbeddings'], (data) => {
-            resolve({
-              userTopics: data.userTopics || [],
-              userTopicEmbeddings: data.userTopicEmbeddings || null
-            });
-          });
-        });
-      }
-    } catch (error) {
-      console.warn('RemoveTube: Could not access storage:', error);
-    }
-    return null;
-  }
-
-  /**
    * Setup topics with message passing support
    */
   async setupTopics(topics) {
-    if (!topics || topics.length === 0) {
-      console.error('RemoveTube: No topics provided for setup');
-      return false;
-    }
-
-    try {
-      const response = await fetch(`${this.serverUrl}/embed-topics`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ topics })
-      });
-
-      if (!response.ok) {
-        throw new Error(`Server responded with ${response.status}`);
-      }
-
-      const result = await response.json();
-      if (result.success) {
-        this.userTopics = topics;
-        this.userTopicEmbeddings = result.embeddings;
-        
-        // Store in browser storage for persistence
-        await this._storeEmbeddings(topics, result.embeddings);
-        
-        console.log('RemoveTube: Topic embeddings generated and stored');
-        return true;
-      }
-    } catch (error) {
-      console.error('RemoveTube: Failed to setup topics:', error);
-    }
-    
-    return false;
-  }
-
-  /**
-   * Store embeddings - works with both extension context and page context
-   */
-  async _storeEmbeddings(topics, embeddings) {
-    try {
-      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
-        return await new Promise((resolve) => {
-          chrome.storage.sync.set({
-            userTopics: topics,
-            userTopicEmbeddings: embeddings
-          }, () => {
-            resolve();
-          });
-        });
-      }
-    } catch (error) {
-      console.warn('RemoveTube: Could not store embeddings:', error);
-    }
+    this.userTopics = topics;
+    console.log('RemoveTube: Topics set:', topics);
   }
 
   /**
