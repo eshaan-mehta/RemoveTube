@@ -4,3 +4,4 @@ pydantic==2.5.0
 transformers
 python-dotenv
 torch==2.2.2
+numpy==1.24.4
