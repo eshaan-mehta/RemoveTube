@@ -111,6 +111,25 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true; // Keep message channel open for async response
   }
   
+  else if (request.action === 'saveSettings') {
+    console.log('Background: Saving settings:', request.data);
+    try {
+      chrome.storage.sync.set(request.data, () => {
+        if (chrome.runtime.lastError) {
+          console.error('Error saving settings:', chrome.runtime.lastError.message);
+          sendResponse({ success: false, error: chrome.runtime.lastError.message });
+        } else {
+          console.log('Settings saved successfully:', request.data);
+          sendResponse({ success: true });
+        }
+      });
+    } catch (error) {
+      console.error('Error accessing storage for saveSettings:', error);
+      sendResponse({ success: false, error: error.message });
+    }
+    return true;
+  }
+  
   // Return true to indicate we will send a response asynchronously
   return true;
 });

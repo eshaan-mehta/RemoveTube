@@ -1,8 +1,5 @@
-fastapi==0.104.1
+fastapi==0.115.9
 uvicorn==0.24.0
-sentence-transformers==2.2.2
-numpy==1.24.3
 pydantic==2.5.0
-python-multipart==0.0.6
-cors==1.0.1
-fastapi-cors==0.0.6
+transformers
+python-dotenv

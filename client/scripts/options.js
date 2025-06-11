@@ -83,7 +83,11 @@ document.addEventListener('DOMContentLoaded', () => {
       isSetupComplete: true
     };
 
-    chrome.storage.sync.set(settings, async () => {
+    chrome.runtime.sendMessage({ action: 'saveSettings', data: settings }, async (response) => {
+      if (chrome.runtime.lastError || !response?.success) {
+        showStatus('Error saving settings. Please try again.', true);
+        return;
+      }
       updateTopicDisplay(topics);
       
       // Setup topics on the AI server
