@@ -105,7 +105,7 @@ async def classify_simple(request: ClassifyRequest):
         content = f"{title} {description}".strip()
         
         # Log incoming request
-        logger.info(f"Processing request - Title: '{title}' | Topics: {request.topics} | Strict mode: {request.strict_mode}")
+        logger.info(f"Processing request - Title: '{title}' | Description: '{description}' | Topics: {request.topics} | Strict mode: {request.strict_mode}")
         
         # Limit content length
         content = content[:512]
