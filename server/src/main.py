@@ -126,6 +126,9 @@ async def classify_simple(request: ClassifyRequest):
             )
         
         # 2. Zero-shot classification
+        if not title.strip():
+            raise HTTPException(status_code=400, detail="Title must not be empty.")
+        
         result = zero_shot_classifier(
             content,
             candidate_labels=request.topics,
