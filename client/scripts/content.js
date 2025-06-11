@@ -1128,121 +1128,100 @@
     console.log('RemoveTube initializing...');
     try {
       const isSetupComplete = await loadSettings();
-      
       console.log('RemoveTube settings loaded:', { 
         allowedTopics: allowedTopics.length, 
-        sessionBased: true 
+        sessionBased: true, 
+        isSetupComplete
       });
-      
-      // Show setup overlay on YouTube home page if no session topics
-      // (This will happen every time user visits YouTube since session storage is cleared)
-      if (isYouTubeHomePage() && allowedTopics.length === 0) {
-        console.log('Showing setup overlay on YouTube home page - No session topics found');
-        // Add a small delay to ensure page is ready
+      // Show setup overlay on YouTube home page only if setup is not complete
+      if (isYouTubeHomePage() && !isSetupComplete) {
+        console.log('Showing setup overlay on YouTube home page - Setup not complete');
         setTimeout(() => {
           showSetupOverlay();
         }, 500);
         return;
       }
+      if (allowedTopics.length === 0) {
+        console.log('No allowed topics set, RemoveTube inactive');
+        return;
+      }
+      // Check if we're on a video page immediately
+      if (window.location.pathname.includes('/watch')) {
+        checkVideoBeforeLoad(window.location.href);
+      }
 
-    if (allowedTopics.length === 0) {
-      console.log('No allowed topics set, RemoveTube inactive');
-      return;
-    }
-
-    // Check if we're on a video page immediately
-    if (window.location.pathname.includes('/watch')) {
-      checkVideoBeforeLoad(window.location.href);
-    }
-
-    // Monitor for navigation changes (YouTube SPA)
-    let lastUrl = location.href;
-    new MutationObserver(() => {
-      const url = location.href;
-      if (url !== lastUrl) {
-        lastUrl = url;
-        
-        // Show setup if navigating to home page (session-based, so always needed)
-        if (isYouTubeHomePage()) {
-          try {
-            chrome.runtime.sendMessage({
-              action: 'getSessionStorage',
-              keys: ['sessionTopics']
-            }, (response) => {
+      // Monitor for navigation changes (YouTube SPA)
+      let lastUrl = location.href;
+      new MutationObserver(() => {
+        const url = location.href;
+        if (url !== lastUrl) {
+          lastUrl = url;
+          // Show setup if navigating to home page and setup is not complete
+          if (isYouTubeHomePage()) {
+            chrome.storage.sync.get(['isSetupComplete'], (data) => {
               if (chrome.runtime.lastError) {
-                console.warn('RemoveTube: Session storage error during navigation:', chrome.runtime.lastError.message);
+                console.warn('RemoveTube: Error loading isSetupComplete during navigation:', chrome.runtime.lastError.message);
                 return;
               }
-
-              if (!response || !response.success) {
-                console.warn('RemoveTube: Failed to get session storage during navigation:', response?.error);
-                return;
-              }
-
-              const topics = response.data.sessionTopics || [];
-              if (topics.length === 0) {
-                console.log('Navigation to home page detected, showing setup overlay (session-based)');
+              if (!data.isSetupComplete) {
+                console.log('Navigation to home page detected, showing setup overlay (setup not complete)');
                 setTimeout(() => showSetupOverlay(), 1000);
               }
             });
-          } catch (error) {
-            console.warn('RemoveTube: Error accessing session storage during navigation:', error);
+          }
+          // Check videos immediately when navigating to watch page
+          if (url.includes('/watch')) {
+            checkVideoBeforeLoad(url);
           }
         }
-        
-        // Check videos immediately when navigating to watch page
-        if (url.includes('/watch')) {
-          checkVideoBeforeLoad(url);
-        }
-      }
-    }).observe(document, { subtree: true, childList: true });
+      }).observe(document, { subtree: true, childList: true });
 
-    // Also intercept clicks on video links for even faster checking
-    document.addEventListener('click', (event) => {
-      const link = event.target.closest('a[href*="/watch"]');
-      if (link && allowedTopics.length > 0) {
-        const href = link.getAttribute('href');
-        if (href && href.includes('/watch')) {
-          // Small delay to allow navigation to start
-          setTimeout(() => {
-            if (window.location.href.includes('/watch')) {
-              checkVideoBeforeLoad(window.location.href);
-            }
-          }, 100);
+      // Also intercept clicks on video links for even faster checking
+      document.addEventListener('click', (event) => {
+        const link = event.target.closest('a[href*="/watch"]');
+        if (link && allowedTopics.length > 0) {
+          const href = link.getAttribute('href');
+          if (href && href.includes('/watch')) {
+            // Small delay to allow navigation to start
+            setTimeout(() => {
+              if (window.location.href.includes('/watch')) {
+                checkVideoBeforeLoad(window.location.href);
+              }
+            }, 100);
+          }
         }
-      }
-    }, true);
+      }, true);
 
-    // Intercept history navigation (back/forward buttons)
-    window.addEventListener('popstate', () => {
-      setTimeout(() => {
-        if (window.location.href.includes('/watch') && allowedTopics.length > 0) {
-          checkVideoBeforeLoad(window.location.href);
-        }
-      }, 100);
-    });
+      // Intercept history navigation (back/forward buttons)
+      window.addEventListener('popstate', () => {
+        setTimeout(() => {
+          if (window.location.href.includes('/watch') && allowedTopics.length > 0) {
+            checkVideoBeforeLoad(window.location.href);
+          }
+        }, 100);
+      });
 
-    // Override pushState and replaceState for SPA navigation detection
-    const originalPushState = history.pushState;
-    const originalReplaceState = history.replaceState;
+      // Override pushState and replaceState for SPA navigation detection
+      const originalPushState = history.pushState;
+      const originalReplaceState = history.replaceState;
 
-    history.pushState = function(...args) {
-      originalPushState.apply(this, args);
-      setTimeout(() => {
-        if (window.location.href.includes('/watch') && allowedTopics.length > 0) {
-          checkVideoBeforeLoad(window.location.href);
-        }
-      }, 50);
-    };
+      history.pushState = function(...args) {
+        originalPushState.apply(this, args);
+        setTimeout(() => {
+          if (window.location.href.includes('/watch') && allowedTopics.length > 0) {
+            checkVideoBeforeLoad(window.location.href);
+          }
+        }, 50);
+      };
 
-    history.replaceState = function(...args) {
-      originalReplaceState.apply(this, args);
-      setTimeout(() => {
-        if (window.location.href.includes('/watch') && allowedTopics.length > 0) {
-          checkVideoBeforeLoad(window.location.href);
-        }
-      }, 50);
-    };
+      history.replaceState = function(...args) {
+        originalReplaceState.apply(this, args);
+        setTimeout(() => {
+          if (window.location.href.includes('/watch') && allowedTopics.length > 0) {
+            checkVideoBeforeLoad(window.location.href);
+          }
+        }, 50);
+      };
     } catch (error) {
       console.error('RemoveTube: Error during initialization:', error);
       // Fall back to basic functionality without extension features
