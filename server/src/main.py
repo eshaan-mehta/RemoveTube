@@ -28,7 +28,7 @@ app.add_middleware(
 )
 
 # Initialize zero-shot classifier
-zero_shot_classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
+zero_shot_classifier = pipeline("zero-shot-classification", model="valhalla/distilbart-mnli-12-1")
 
 # Request/Response models
 class ClassifyRequest(BaseModel):
