@@ -6,7 +6,7 @@ from typing import List
 import logging
 import time
 import re
-from transformers import pipeline
+import requests
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -27,8 +27,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize zero-shot classifier
-zero_shot_classifier = pipeline("zero-shot-classification", model="valhalla/distilbart-mnli-12-1")
+# Hugging Face API configuration
+HF_API_KEY = os.getenv("HF_API_KEY")
+HF_API_URL = "https://api-inference.huggingface.co/models/valhalla/distilbart-mnli-12-1"
+HF_HEADERS = {"Authorization": f"Bearer {HF_API_KEY}"}
 
 # Request/Response models
 class ClassifyRequest(BaseModel):
@@ -80,6 +82,31 @@ def keyword_match(content: str, topics: List[str], min_confidence: float = 0.8) 
     
     return False, "", 0.0
 
+async def classify_with_hf_api(content: str, topics: List[str]) -> tuple[str, float]:
+    """
+    Classify content using Hugging Face API
+    Returns: (best_topic, confidence)
+    """
+    try:
+        payload = {
+            "inputs": content,
+            "parameters": {
+                "candidate_labels": topics,
+                "hypothesis_template": "This video is about {} and contains content related to this topic."
+            }
+        }
+        
+        response = requests.post(HF_API_URL, headers=HF_HEADERS, json=payload)
+        response.raise_for_status()
+        
+        result = response.json()
+        best_idx = result["scores"].index(max(result["scores"]))
+        return result["labels"][best_idx], result["scores"][best_idx]
+        
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error calling Hugging Face API: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error calling classification API")
+
 @app.get("/")
 async def root():
     return {
@@ -91,7 +118,7 @@ async def root():
 async def health_check():
     return {
         "status": "healthy",
-        "model_loaded": True
+        "api_configured": bool(HF_API_KEY)
     }
 
 @app.post("/classify-simple", response_model=ClassifyResponse)
@@ -99,7 +126,7 @@ async def classify_simple(request: ClassifyRequest):
     """
     Classify video content using a hybrid approach:
     1. Quick keyword matching with variations
-    2. Zero-shot classification as fallback
+    2. Hugging Face API classification as fallback
     """
     try:
         start_time = time.time()
@@ -130,20 +157,11 @@ async def classify_simple(request: ClassifyRequest):
                 processing_time_ms=processing_time
             )
         
-        # 2. Zero-shot classification
+        # 2. Hugging Face API classification
         if not title.strip():
             raise HTTPException(status_code=400, detail="Title must not be empty.")
         
-        result = zero_shot_classifier(
-            content,
-            candidate_labels=request.topics,
-            hypothesis_template="This video is about {} and contains content related to this topic."
-        )
-        
-        # Fix: Get the index of the maximum score directly
-        best_idx = result["scores"].index(max(result["scores"]))
-        best_topic = result["labels"][best_idx]
-        best_score = result["scores"][best_idx]
+        best_topic, best_score = await classify_with_hf_api(content, request.topics)
         
         # Determine threshold based on strict mode
         threshold = 0.5 if request.strict_mode else 0.3
@@ -153,13 +171,13 @@ async def classify_simple(request: ClassifyRequest):
         
         processing_time = (time.time() - start_time) * 1000
         
-        logger.info(f"Zero-shot classification for '{title}' - Topic: {best_topic} (confidence: {best_score:.3f}) - {'ALLOWED' if is_allowed else 'BLOCKED'} [{processing_time:.2f}ms]")
+        logger.info(f"API classification for '{title}' - Topic: {best_topic} (confidence: {best_score:.3f}) - {'ALLOWED' if is_allowed else 'BLOCKED'} [{processing_time:.2f}ms]")
         
         return ClassifyResponse(
             allowed=is_allowed,
             topic=best_topic,
             confidence=best_score,
-            method="zero-shot",
+            method="api",
             processing_time_ms=processing_time
         )
         
