@@ -443,8 +443,32 @@
     }
   }
 
+  // Helper to get video ID from URL
+  function getVideoIdFromUrl(url) {
+    try {
+      const urlObj = new URL(url);
+      return urlObj.searchParams.get('v');
+    } catch {
+      return null;
+    }
+  }
+
   // Block video with explanation
-  function blockVideo(reason, topic, confidence) {
+  async function blockVideo(reason, topic, confidence) {
+    // Get current video ID
+    const videoId = getVideoIdFromUrl(window.location.href);
+    if (videoId) {
+      // Check for override
+      const overrides = await new Promise(resolve => {
+        chrome.storage.local.get(['watchAnywayOverrides'], result => {
+          resolve(result.watchAnywayOverrides || []);
+        });
+      });
+      if (overrides.includes(videoId)) {
+        console.log('Watch Anyway override found for this video, skipping block.');
+        return;
+      }
+    }
     // Set blocked video flag to prevent storage access
     isVideoBlocked = true;
     
@@ -663,7 +687,7 @@
       }
 
       if (watchAnywayBtn) {
-        watchAnywayBtn.addEventListener('click', (e) => {
+        watchAnywayBtn.addEventListener('click', async (e) => {
           e.preventDefault();
           console.log('Watch Anyway button clicked - user override for misdetection');
           console.log('Override details:', { 
@@ -672,52 +696,35 @@
             confidence: confidence,
             allowedTopics: allowedTopics 
           });
-          
           // Show confirmation to ensure user understands
           const confirmed = confirm(
             'Are you sure you want to watch this video?\n\n' +
             'This will override the content filter for this video only. The filter will continue to work for other videos.\n\n' +
             'Click OK to proceed or Cancel to go back.'
           );
-          
           if (confirmed) {
+            // Store override for this video ID
+            const videoId = getVideoIdFromUrl(originalUrl);
+            if (videoId) {
+              chrome.storage.local.get(['watchAnywayOverrides'], result => {
+                const overrides = result.watchAnywayOverrides || [];
+                if (!overrides.includes(videoId)) {
+                  overrides.push(videoId);
+                  chrome.storage.local.set({ watchAnywayOverrides: overrides });
+                  console.log('Watch Anyway override saved for video:', videoId);
+                }
+              });
+            }
             // Show loading state
             watchAnywayBtn.textContent = '⏳ Loading video...';
             watchAnywayBtn.disabled = true;
             watchAnywayBtn.style.background = '#999';
-            
             // Clear the interval immediately
             clearInterval(navigationChecker);
-            
             // Reset blocked video flag
             isVideoBlocked = false;
-            
-            console.log('User confirmed override, reloading original video at:', originalUrl);
-            
-            // Track override usage for debugging (optional - could be used for improving detection)
-            try {
-              chrome.storage.local.get(['overrideCount'], (result) => {
-                const count = (result.overrideCount || 0) + 1;
-                chrome.storage.local.set({ overrideCount: count });
-                console.log('User override count updated:', count);
-              });
-            } catch (error) {
-              console.log('Could not track override usage:', error);
-            }
-            
-            try {
-              // Restore the original page by reloading
-              window.location.reload();
-            } catch (error) {
-              console.error('Error reloading page:', error);
-              // Fallback: try to navigate to the original URL
-              try {
-                window.location.assign(originalUrl);
-              } catch (fallbackError) {
-                console.error('Fallback navigation failed:', fallbackError);
-                alert('Unable to load the video. Please try refreshing the page manually.');
-              }
-            }
+            // Instead of reloading, restore the original page (simulate navigation)
+            window.location.assign(originalUrl);
           } else {
             console.log('User cancelled override');
           }
@@ -772,12 +779,6 @@
     });
     
     console.log('=== END DEBUG ===');
-  }
-
-  // Get video ID from URL
-  function getVideoIdFromUrl(url) {
-    const urlObj = new URL(url);
-    return urlObj.searchParams.get('v');
   }
 
   // Fetch video metadata from YouTube API (fallback method)
@@ -937,23 +938,16 @@
   async function checkVideoBeforeLoad(videoUrl) {
     if (isProcessing) return;
     isProcessing = true;
-
-    // Reset blocked video flag at start of check
     isVideoBlocked = false;
-
-    const timeoutDuration = 5000; // 5 seconds timeout
+    const timeoutDuration = 5000;
     let timeoutId;
-
     try {
       showLoadingOverlay();
-      
-      // Set a timeout to prevent hanging
       timeoutId = setTimeout(() => {
         console.log('Video check timeout, allowing video to load');
         hideLoadingOverlay();
         isProcessing = false;
       }, timeoutDuration);
-      
       const videoId = getVideoIdFromUrl(videoUrl);
       if (!videoId) {
         clearTimeout(timeoutId);
@@ -961,35 +955,24 @@
         isProcessing = false;
         return;
       }
-
       console.log('Checking video immediately:', videoId);
-
-      // First, try to get metadata from the current page if available
       let metadata = await fetchVideoMetadata(videoId);
-      
-      // If no metadata found, wait a bit and try to find elements
       if (!metadata.title && !metadata.description) {
         await new Promise(resolve => setTimeout(resolve, 1000));
         metadata = await findVideoElements();
       }
-
-      // If still no metadata after reasonable attempts, allow the video to load
+      // Only proceed if at least one is non-empty
       if (!metadata.title && !metadata.description) {
-        console.log('No video metadata found, allowing video to load');
+        console.log('No video metadata found (title/description both empty), skipping classification request.');
         clearTimeout(timeoutId);
         hideLoadingOverlay();
         isProcessing = false;
         return;
       }
-
-      console.log('Found video metadata:', metadata.title);
-
-      // Check content
+      console.log('Found video metadata:', metadata.title, metadata.description);
       const result = await checkContentWithAI(metadata.title, metadata.description);
-
       clearTimeout(timeoutId);
       hideLoadingOverlay();
-
       if (!result.allowed) {
         blockVideo('Content not in allowed topics', result.topic, result.confidence);
       } else {
@@ -1016,7 +999,6 @@
       'h1.title',
       '#above-the-fold #title h1'
     ];
-    
     const descSelectors = [
       '#description-inline-expander yt-formatted-string',
       '.ytd-expandable-video-description-body-renderer yt-formatted-string',
@@ -1027,16 +1009,12 @@
       '[id="description"]',
       '.ytd-video-secondary-info-renderer #description'
     ];
-    
     let title = '';
     let description = '';
-    
-    // Try multiple times with increasing delays
-    for (let attempt = 0; attempt < 5; attempt++) {
+    for (let attempt = 0; attempt < 7; attempt++) { // more attempts
       if (attempt > 0) {
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 600));
       }
-      
       // Try to find title
       if (!title) {
         for (const selector of titleSelectors) {
@@ -1047,7 +1025,6 @@
           }
         }
       }
-      
       // Try to find description
       if (!description) {
         for (const selector of descSelectors) {
@@ -1058,13 +1035,11 @@
           }
         }
       }
-      
-      // If we found both or at least a title, break
-      if (title && (description || attempt >= 2)) {
+      // If we found at least one, break
+      if (title || description) {
         break;
       }
     }
-    
     return { title, description };
   }
 
@@ -1072,34 +1047,23 @@
   async function checkCurrentVideo() {
     if (isProcessing) return;
     isProcessing = true;
-
-    // Reset blocked video flag at start of check
     isVideoBlocked = false;
-
     try {
-      // Wait for page to load
       await new Promise(resolve => setTimeout(resolve, 2000));
-
       const metadata = await findVideoElements();
-      
+      // Only proceed if at least one is non-empty
       if (!metadata.title && !metadata.description) {
-        // Not a video page or content not loaded yet
+        console.log('No video metadata found (title/description both empty) in fallback, skipping classification request.');
         isProcessing = false;
         return;
       }
-
-      console.log('Fallback check - Video title:', metadata.title);
-
-      // Check content
+      console.log('Fallback check - Video title/desc:', metadata.title, metadata.description);
       const result = await checkContentWithAI(metadata.title, metadata.description);
-
       if (!result.allowed) {
         blockVideo('Content not in allowed topics', result.topic, result.confidence);
       } else {
         console.log('Video allowed:', result.topic, `(${Math.round(result.confidence * 100)}% confidence)`);
       }
-    } catch (error) {
-      console.error('Error checking video:', error);
     } finally {
       isProcessing = false;
     }
@@ -1127,12 +1091,14 @@
   async function init() {
     console.log('RemoveTube initializing...');
     try {
-      const isSetupComplete = await loadSettings();
-      console.log('RemoveTube settings loaded:', { 
-        allowedTopics: allowedTopics.length, 
-        sessionBased: true, 
-        isSetupComplete
+      // Always check persistent storage for setup status
+      const setupData = await new Promise(resolve => {
+        chrome.storage.sync.get(['allowedTopics', 'strictMode', 'isSetupComplete'], resolve);
       });
+      allowedTopics = setupData.allowedTopics || [];
+      strictMode = setupData.strictMode !== false;
+      const isSetupComplete = setupData.isSetupComplete === true;
+      console.log('RemoveTube settings loaded:', { allowedTopics: allowedTopics.length, sessionBased: true, isSetupComplete });
       // Show setup overlay on YouTube home page only if setup is not complete
       if (isYouTubeHomePage() && !isSetupComplete) {
         console.log('Showing setup overlay on YouTube home page - Setup not complete');
@@ -1145,31 +1111,26 @@
         console.log('No allowed topics set, RemoveTube inactive');
         return;
       }
-      // Check if we're on a video page immediately
       if (window.location.pathname.includes('/watch')) {
         checkVideoBeforeLoad(window.location.href);
       }
-
       // Monitor for navigation changes (YouTube SPA)
       let lastUrl = location.href;
       new MutationObserver(() => {
         const url = location.href;
         if (url !== lastUrl) {
           lastUrl = url;
-          // Show setup if navigating to home page and setup is not complete
-          if (isYouTubeHomePage()) {
-            chrome.storage.sync.get(['isSetupComplete'], (data) => {
-              if (chrome.runtime.lastError) {
-                console.warn('RemoveTube: Error loading isSetupComplete during navigation:', chrome.runtime.lastError.message);
-                return;
-              }
-              if (!data.isSetupComplete) {
-                console.log('Navigation to home page detected, showing setup overlay (setup not complete)');
-                setTimeout(() => showSetupOverlay(), 1000);
-              }
-            });
-          }
-          // Check videos immediately when navigating to watch page
+          // Always check persistent storage for setup status on navigation
+          chrome.storage.sync.get(['isSetupComplete'], (data) => {
+            if (chrome.runtime.lastError) {
+              console.warn('RemoveTube: Error loading isSetupComplete during navigation:', chrome.runtime.lastError.message);
+              return;
+            }
+            if (isYouTubeHomePage() && !data.isSetupComplete) {
+              console.log('Navigation to home page detected, showing setup overlay (setup not complete)');
+              setTimeout(() => showSetupOverlay(), 1000);
+            }
+          });
           if (url.includes('/watch')) {
             checkVideoBeforeLoad(url);
           }
