@@ -3,4 +3,4 @@ uvicorn==0.24.0
 pydantic==2.5.0
 transformers
 python-dotenv
-torch==2.2.2+cpu
+torch==2.2.2
