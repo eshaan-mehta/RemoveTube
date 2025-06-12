@@ -1,219 +1,98 @@
-# 🎯 RemoveTube - Anti-Procrastination Chrome Extension
+# 🎯 RemoveTube - Your YouTube Content Filter
 
-RemoveTube helps you stay focused and productive on YouTube by filtering content based on your allowed topics. Say goodbye to endless scrolling and unintended procrastination!
+Tired of getting distracted on YouTube? RemoveTube helps you stay focused by only showing content that matters to you. Set your allowed topics, and we'll automatically block anything that doesn't match your goals.
 
-## ✨ Features
+## ✨ What Makes RemoveTube Special
 
-- **Smart Content Filtering**: Automatically blocks YouTube videos that don't match your allowed topics
-- **Server-Based AI**: Uses cutting-edge AI models running on a local server for maximum accuracy!
-- **Advanced Classification**: Semantic similarity matching using sentence-transformers
-- **Privacy First**: All AI processing happens on your local machine - no external API calls
-- **Customizable Topics**: Set your own allowed content categories
-- **Flexible Modes**: Choose between strict and relaxed filtering
-- **Usage Statistics**: Track your productivity with daily stats
-- **Easy Setup**: Session-based configuration that appears every time you visit YouTube
+- **Smart Filtering**: We use AI to understand video content and match it with your interests
+- **Privacy-Focused**: Your data stays on your device - we only use our server for content analysis
+- **Easy to Use**: Set up your topics once, and we'll handle the rest
+- **Flexible Control**: Choose between strict or relaxed filtering modes
+- **Stay on Track**: See how many distracting videos we've blocked for you
+- **Session-Based**: Your settings reset when you leave YouTube, keeping you mindful of your choices
 
 ## 🚀 How It Works
 
-1. **Initial Setup**: When you visit YouTube, you'll be prompted to set up your allowed content topics
-2. **Content Analysis**: Each video you try to watch is analyzed by the AI server against your allowed topics
-3. **Smart Blocking**: Videos that don't match are blocked with a helpful explanation
-4. **Session-Based**: Your topics are saved only for the current session and cleared when you leave YouTube
+1. **First Visit**: When you open YouTube, we'll ask you what topics you want to see
+2. **Smart Analysis**: As you browse, we check each video against your topics
+3. **Stay Focused**: Videos that don't match your goals are blocked with a friendly explanation
+4. **Fresh Start**: Your topics reset when you leave YouTube, helping you stay intentional
 
-## 📋 Installation
+## 📱 Installation
 
-### Prerequisites
+1. Open Chrome and go to `chrome://extensions/`
+2. Enable "Developer mode" in the top right
+3. Click "Load unpacked" and select the `client` folder
+4. Look for the RemoveTube icon in your browser toolbar
+5. Visit YouTube to start setting up your content filter
 
-1. **Start the AI Server**: 
-   ```bash
-   cd RemoveTube/server
-   pip install -r requirements.txt
-   python -m uvicorn main:app --host 0.0.0.0 --port 8080
-   ```
+## 🔒 Privacy Policy
 
-### Install the Extension
+### Data Collection and Usage
 
-1. Clone or download this repository
-2. Open Chrome and go to `chrome://extensions/`
-3. Enable "Developer mode" in the top right
-4. Click "Load unpacked" and select the `client` folder
-5. The extension will appear in your browser toolbar
-6. Navigate to YouTube.com to start the setup process
+RemoveTube is designed with privacy as a core principle. Here's how we handle your data:
 
-## ⚙️ Configuration
+#### What We Collect
+- **Video Metadata**: We only access the title and description of videos you attempt to watch
+- **Allowed Topics**: Your chosen topics for content filtering
+- **Usage Statistics**: Basic metrics like number of videos blocked/allowed (stored locally)
 
-### Setting Up Your Allowed Topics
+#### How We Use Your Data
+1. **Content Filtering**: 
+   - Video titles and descriptions are analyzed against your allowed topics
+   - This data is processed locally and not stored
+   - No video content or viewing history is collected
 
-1. Navigate to YouTube.com - the setup wizard will appear automatically
-2. Add your allowed topics (comma-separated):
-   - Examples: `education, programming, music, cooking, fitness`
-3. Choose your filtering strictness
-4. Enjoy advanced AI-powered filtering with server-based accuracy!
+2. **Topic Management**:
+   - Your allowed topics are stored locally in your browser
+   - Topics are cleared when you leave YouTube
+   - No personal preferences are sent to external servers
 
-### Server-Based AI Processing
+3. **Usage Statistics**:
+   - Basic stats are stored locally in your browser
+   - No usage data is sent to external servers
+   - Stats are used only to show your productivity metrics
 
-RemoveTube uses advanced AI models running on a local server:
+#### Data Storage
+- All data is stored locally in your browser using Chrome's storage API
+- No data is sent to external servers except for the AI classification requests
+- Session data is automatically cleared when you leave YouTube
 
-- **Sentence Transformers**: Uses all-MiniLM-L6-v2 for semantic understanding
-- **Vector Embeddings**: Creates high-quality embeddings for content and topics
-- **Cosine Similarity**: Accurate similarity matching between content and allowed topics
-- **Local Processing**: Runs on your machine - no external API calls
-- **Fast Response**: ~50ms classification time for quick filtering
+#### Permissions Justification
+- `"*://*.youtube.com/*"`: Required to access video metadata and modify page content
+- `"https://removetube-server.onrender.com/*"`: Required for AI-powered content classification
+- `"storage"`: Required to store your preferences and usage statistics locally
+
+#### Your Control
+- You can clear all stored data at any time through the extension settings
+- The extension can be disabled at any time
+- No data is collected when the extension is disabled
 
 ## 🛠️ How to Use
 
-### Basic Usage
+### Setting Up Your Topics
 
-1. **Setup**: Configure your allowed topics when you visit YouTube (session-based)
-2. **Browse**: Use YouTube normally
-3. **Filtering**: Videos not matching your topics will be automatically blocked
-4. **Session**: Topics are saved only for your current YouTube session
-5. **Override**: Use debug functions in console if needed for testing
+1. Click the RemoveTube icon in your browser toolbar
+2. Enter the topics you want to see (e.g., "coding, math, science")
+3. Choose between strict or relaxed mode:
+   - **Strict**: Only shows videos that clearly match your topics
+   - **Relaxed**: Allows videos that might be related to your topics
 
-### Managing Settings
+### Managing Your Experience
 
-- **Extension Popup**: Quick access to enable/disable and view stats
-- **Options Page**: Full configuration including topics, API key, and advanced settings
-- **Statistics**: Track your daily blocked/allowed video counts
+- **View Stats**: See how many videos we've blocked and allowed
+- **Change Topics**: Update your allowed topics anytime
+- **Toggle Mode**: Switch between strict and relaxed filtering
+- **Disable**: Turn off the extension when you want to browse freely
 
-### Preset Topic Categories
+## 🤝 Support
 
-Choose from predefined topic sets:
+Having trouble? Here's how to get help:
 
-- 📚 **Study & Learning**: education, programming, science, tutorials
-- 🎵 **Music Only**: music, instrumental, classical, ambient
-- 💪 **Health & Fitness**: exercise, workout, nutrition, yoga
-- 🍳 **Cooking**: recipes, baking, food preparation
-- 🧘 **Mindfulness**: meditation, relaxation, sleep sounds
-- 📰 **News**: current events, politics, economics
+1. **Check the FAQ**: Look for common questions and answers
+2. **Report Issues**: Let us know if something's not working
+3. **Feature Requests**: Suggest improvements you'd like to see
 
-## 🔧 Technical Details
+## 📝 License
 
-### Content Analysis Methods
-
-1. **Server-Based AI Classification**:
-   - Uses sentence-transformers/all-MiniLM-L6-v2 for semantic understanding
-   - Vector embedding similarity matching
-   - Fast and accurate classification (~50ms response time)
-   - Runs on local server for privacy
-
-2. **Keyword Matching** (fallback):
-   - Simple but effective keyword-based filtering
-   - Automatic fallback if AI server is unavailable
-   - Matches topics against video titles and descriptions
-
-### Privacy & Security
-
-- **Local Processing**: All AI processing happens on your local server - no external API calls
-- **Session Storage**: Topics stored only in browser session storage (cleared when leaving YouTube)
-- **No Data Collection**: Extension doesn't collect, store, or transmit any personal data
-- **Local Server**: AI models run on your machine for complete privacy
-- **Open Source**: Full source code available for transparency
-
-## 📊 Statistics & Insights
-
-Track your productivity with built-in statistics:
-
-- **Daily Counts**: Videos blocked and allowed today
-- **Total Counts**: Lifetime statistics
-- **Streak Counter**: Days of consistent usage
-- **Topic Insights**: See which topics are most commonly matched
-
-## 🎛️ Advanced Configuration
-
-### Strict vs. Relaxed Mode
-
-- **Strict Mode**: Blocks videos when classification confidence is low
-- **Relaxed Mode**: Allows videos with uncertain classification
-- **Recommendation**: Start with strict mode, adjust based on your needs
-
-### Custom Topic Strategies
-
-- **Broad Topics**: Use general terms like "education" for wider coverage
-- **Specific Topics**: Use precise terms like "JavaScript programming" for focused filtering
-- **Multiple Approaches**: Combine both broad and specific topics for balanced filtering
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**Extension not working on YouTube:**
-- Refresh the YouTube page after installation
-- Check that the extension is enabled in `chrome://extensions/`
-- Ensure you've completed the initial setup
-
-**Videos not being blocked:**
-- Verify your allowed topics are set correctly in the session
-- Check if strict mode is enabled for more aggressive filtering
-- Try adding more specific keywords for your allowed content
-- Ensure the AI server is running on localhost:8080
-
-**AI server not working:**
-- Check that the server is running: `curl http://localhost:8080/health`
-- Restart the server: `python -m uvicorn main:app --host 0.0.0.0 --port 8080`
-- Check browser console for connection error messages
-- Extension will automatically fall back to keyword matching if server fails
-
-**Setup wizard not appearing:**
-- Clear session storage using: `clearRemoveTubeStorage()` in browser console
-- Refresh the YouTube page
-- Check that you're on the YouTube homepage
-
-### Performance Tips
-
-- **Topic Optimization**: Use 3-7 well-chosen topics for best results
-- **Server Performance**: FastAPI server provides ~50ms response times
-- **Browser Performance**: Extension is optimized for minimal resource usage
-- **Session Storage**: Topics cleared automatically when leaving YouTube
-
-## 🤝 Contributing
-
-We welcome contributions! Here's how you can help:
-
-1. **Report Bugs**: Use GitHub issues to report problems
-2. **Suggest Features**: Share ideas for new functionality
-3. **Submit PRs**: Contribute code improvements
-4. **Documentation**: Help improve this README and inline docs
-
-### Development Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/RemoveTube.git
-cd RemoveTube
-
-# Start the AI server
-cd server
-pip install -r requirements.txt
-python -m uvicorn main:app --host 0.0.0.0 --port 8080
-
-# Load extension in Chrome
-# Open chrome://extensions/, enable Developer mode
-# Click "Load unpacked" and select the client/ folder
-```
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **FastAPI**: For providing an excellent web framework for the AI server
-- **sentence-transformers**: For the all-MiniLM-L6-v2 model enabling semantic understanding
-- **scikit-learn**: For cosine similarity calculations
-- **Chrome Extension APIs**: For enabling seamless browser integration
-- **Open Source Community**: For inspiration and best practices
-
-## 📞 Support
-
-Need help? Have questions?
-
-- **GitHub Issues**: [Report bugs or request features](https://github.com/yourusername/RemoveTube/issues)
-- **Documentation**: Check this README for common solutions
-- **Community**: Join discussions in GitHub Discussions
-
----
-
-**Stay focused, stay productive!** 🎯
-
-Made with ❤️ for anyone trying to use YouTube more intentionally.
+This project is licensed under the MIT License - see the LICENSE file for details.
