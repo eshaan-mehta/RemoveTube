@@ -37,7 +37,7 @@ A Chrome extension that filters YouTube content based on user-defined topics usi
 4. Choose the `client` directory
 5. The extension will be available in the Chrome toolbar
 
-## 🔒 Privacy Policy
+## Privacy Policy
 
 ### Data Collection and Usage
 
