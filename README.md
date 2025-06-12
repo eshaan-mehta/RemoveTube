@@ -1,10 +1,10 @@
-# RemoveTube - YouTube Content Filter
+# RemoveTube - Chrome Extension to help you stay focused on YouTube
 
 A Chrome extension that filters YouTube content based on user-defined topics using AI-powered classification.
 
 ## Core Functionality
 
-- **Content Classification**: AI-based analysis of video metadata against user-defined topics
+- **Content Classification**: AI-based analysis using zero-shot classification of video metadata against user-defined topics
 - **Local Storage**: Browser-based storage for user preferences and session data
 - **Real-time Filtering**: Immediate content analysis and blocking on YouTube pages
 - **Session Management**: Topic preferences reset on domain exit
@@ -25,7 +25,7 @@ A Chrome extension that filters YouTube content based on user-defined topics usi
 
 3. **Data Flow**:
    - Client-side content extraction
-   - Server-side AI classification
+   - Server-side AI classification using Meta Bart (zero-shot classification)
    - Local storage for user preferences
    - Session-based topic management
 
