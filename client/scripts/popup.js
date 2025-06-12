@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Check server status
       let serverStatus = 'Unknown';
       try {
-        const response = await fetch('http://localhost:8080/health');
+        const response = await fetch('https://removetube-server.onrender.com/health');
         if (response.ok) {
           const health = await response.json();
           serverStatus = health.status === 'healthy' ? '✅ Online' : '⚠️ Issues';

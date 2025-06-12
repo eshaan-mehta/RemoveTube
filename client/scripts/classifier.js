@@ -5,7 +5,7 @@
 
 class AIClassifier {
   constructor() {
-    this.serverUrl = 'http://localhost:8080';
+    this.serverUrl = 'https://removetube-server.onrender.com';
     this.isInitialized = false;
     this.userTopics = [];
   }
