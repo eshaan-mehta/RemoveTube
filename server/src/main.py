@@ -29,7 +29,7 @@ app.add_middleware(
 
 # Hugging Face API configuration
 HF_API_KEY = os.getenv("HF_API_KEY")
-HF_API_URL = "https://api-inference.huggingface.co/models/valhalla/distilbart-mnli-12-1"
+HF_API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli"
 HF_HEADERS = {"Authorization": f"Bearer {HF_API_KEY}"}
 
 # Request/Response models
@@ -49,6 +49,13 @@ class ClassifyResponse(BaseModel):
 def get_topic_variations(topic: str) -> List[str]:
     """Generate common variations of a topic for better matching"""
     variations = [topic.lower()]
+    # Split multi-word topics
+    words = topic.lower().split()
+    
+    # For single-word topics, add the word itself
+    if len(words) == 1:
+        variations.append(words[0])
+    
     # Add plural form
     if not topic.endswith('s'):
         variations.append(topic.lower() + 's')
@@ -70,12 +77,18 @@ def keyword_match(content: str, topics: List[str], min_confidence: float = 0.8) 
     for topic in topics:
         variations = get_topic_variations(topic)
         for variation in variations:
-            # Use word boundaries to avoid partial matches
-            pattern = r'\b' + re.escape(variation) + r'\b'
+            # For single words, don't use word boundaries
+            if len(variation.split()) == 1:
+                pattern = r'\b' + re.escape(variation) + r'\b'
+            else:
+                pattern = r'\b' + re.escape(variation) + r'\b'
+                
             if re.search(pattern, content):
                 # Calculate confidence based on number of matches and position
                 matches = len(re.findall(pattern, content))
-                confidence = min(1.0, 0.7 + (matches * 0.1))  # Base 0.7 + 0.1 per match, max 1.0
+                # Higher base confidence for exact matches
+                base_confidence = 0.8 if variation == topic.lower() else 0.6
+                confidence = min(1.0, base_confidence + (matches * 0.1))  # Base + 0.1 per match, max 1.0
                 
                 if confidence >= min_confidence:
                     return True, topic, confidence
@@ -143,7 +156,7 @@ async def classify_simple(request: ClassifyRequest):
         content = content[:512]
         
         # 1. Enhanced keyword matching
-        min_keyword_confidence = 0.8 if request.strict_mode else 0.7
+        min_keyword_confidence = 0.6 if request.strict_mode else 0.5
         is_match, matched_topic, confidence = keyword_match(content, request.topics, min_keyword_confidence)
         
         if is_match:
