@@ -1,30 +1,41 @@
-# 🎯 RemoveTube - Your YouTube Content Filter
+# RemoveTube - YouTube Content Filter
 
-Tired of getting distracted on YouTube? RemoveTube helps you stay focused by only showing content that matters to you. Set your allowed topics, and we'll automatically block anything that doesn't match your goals.
+A Chrome extension that filters YouTube content based on user-defined topics using AI-powered classification.
 
-## ✨ What Makes RemoveTube Special
+## Core Functionality
 
-- **Smart Filtering**: We use AI to understand video content and match it with your interests
-- **Privacy-Focused**: Your data stays on your device - we only use our server for content analysis
-- **Easy to Use**: Set up your topics once, and we'll handle the rest
-- **Flexible Control**: Choose between strict or relaxed filtering modes
-- **Stay on Track**: See how many distracting videos we've blocked for you
-- **Session-Based**: Your settings reset when you leave YouTube, keeping you mindful of your choices
+- **Content Classification**: AI-based analysis of video metadata against user-defined topics
+- **Local Storage**: Browser-based storage for user preferences and session data
+- **Real-time Filtering**: Immediate content analysis and blocking on YouTube pages
+- **Session Management**: Topic preferences reset on domain exit
+- **Usage Analytics**: Local tracking of blocked and allowed content
 
-## 🚀 How It Works
+## Technical Implementation
 
-1. **First Visit**: When you open YouTube, we'll ask you what topics you want to see
-2. **Smart Analysis**: As you browse, we check each video against your topics
-3. **Stay Focused**: Videos that don't match your goals are blocked with a friendly explanation
-4. **Fresh Start**: Your topics reset when you leave YouTube, helping you stay intentional
+1. **Content Analysis**:
+   - Extracts video title and description metadata
+   - Performs semantic analysis against user topics
+   - Implements both strict and relaxed classification modes
 
-## 📱 Installation
+2. **User Interface**:
+   - Setup overlay on YouTube homepage
+   - Content blocking interface for filtered videos
+   - Extension popup for settings and statistics
+   - Options page for advanced configuration
 
-1. Open Chrome and go to `chrome://extensions/`
-2. Enable "Developer mode" in the top right
-3. Click "Load unpacked" and select the `client` folder
-4. Look for the RemoveTube icon in your browser toolbar
-5. Visit YouTube to start setting up your content filter
+3. **Data Flow**:
+   - Client-side content extraction
+   - Server-side AI classification
+   - Local storage for user preferences
+   - Session-based topic management
+
+## Installation
+
+1. Navigate to `chrome://extensions/`
+2. Enable Developer mode
+3. Select "Load unpacked"
+4. Choose the `client` directory
+5. The extension will be available in the Chrome toolbar
 
 ## 🔒 Privacy Policy
 
@@ -68,31 +79,32 @@ RemoveTube is designed with privacy as a core principle. Here's how we handle yo
 - The extension can be disabled at any time
 - No data is collected when the extension is disabled
 
-## 🛠️ How to Use
+## Configuration
 
-### Setting Up Your Topics
+### Topic Management
 
-1. Click the RemoveTube icon in your browser toolbar
-2. Enter the topics you want to see (e.g., "coding, math, science")
-3. Choose between strict or relaxed mode:
-   - **Strict**: Only shows videos that clearly match your topics
-   - **Relaxed**: Allows videos that might be related to your topics
+1. Access settings via extension popup
+2. Define allowed topics (comma-separated)
+3. Select classification mode:
+   - **Strict**: Higher confidence threshold for matches
+   - **Relaxed**: Lower confidence threshold for matches
 
-### Managing Your Experience
+### Extension Features
 
-- **View Stats**: See how many videos we've blocked and allowed
-- **Change Topics**: Update your allowed topics anytime
-- **Toggle Mode**: Switch between strict and relaxed filtering
-- **Disable**: Turn off the extension when you want to browse freely
+- **Content Filtering**: Automatic blocking of non-matching content
+- **Topic Configuration**: User-defined topic management
+- **Mode Selection**: Strict/relaxed classification options
+- **Statistics**: Local tracking of filtered content
+- **Session Control**: Automatic topic reset on domain exit
 
-## 🤝 Support
+## Technical Support
 
-Having trouble? Here's how to get help:
+For technical issues:
+1. Check browser console for error messages
+2. Verify extension permissions
+3. Review server connection status
+4. Submit detailed issue reports
 
-1. **Check the FAQ**: Look for common questions and answers
-2. **Report Issues**: Let us know if something's not working
-3. **Feature Requests**: Suggest improvements you'd like to see
-
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
