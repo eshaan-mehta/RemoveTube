@@ -29,7 +29,7 @@ app.add_middleware(
 
 # Hugging Face API configuration
 HF_API_KEY = os.getenv("HF_API_KEY")
-HF_API_URL = "https://api-inference.huggingface.co/models/valhalla/distilbart-mnli-12-1"
+HF_API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli"
 HF_HEADERS = {"Authorization": f"Bearer {HF_API_KEY}"}
 
 # Request/Response models
@@ -125,7 +125,7 @@ async def health_check():
 async def classify_simple(request: ClassifyRequest):
     """
     Classify video content using a hybrid approach:
-    1. Quick keyword matching with variations
+    1. Quick keyword matching with variations (excluding 'other')
     2. Hugging Face API classification as fallback
     """
     try:
@@ -142,13 +142,16 @@ async def classify_simple(request: ClassifyRequest):
         # Limit content length
         content = content[:512]
         
-        # 1. Enhanced keyword matching
+        # Filter out 'other' from topics for keyword matching
+        keyword_topics = [topic for topic in request.topics if topic.lower() != 'other']
+        
+        # 1. Enhanced keyword matching (excluding 'other')
         min_keyword_confidence = 0.8 if request.strict_mode else 0.7
-        is_match, matched_topic, confidence = keyword_match(content, request.topics, min_keyword_confidence)
+        is_match, matched_topic, confidence = keyword_match(content, keyword_topics, min_keyword_confidence)
         
         if is_match:
             processing_time = (time.time() - start_time) * 1000
-            logger.info(f"Keyword match found for '{title}' - Topic: {matched_topic} (confidence: {confidence:.3f}) [{processing_time:.2f}ms]")
+            logger.info(f"[KEYWORD] ALLOWED: '{title}' | Topic: {matched_topic} | Confidence: {confidence:.3f} | [{processing_time:.2f}ms]")
             return ClassifyResponse(
                 allowed=True,
                 topic=matched_topic,
@@ -166,12 +169,24 @@ async def classify_simple(request: ClassifyRequest):
         # Determine threshold based on strict mode
         threshold = 0.5 if request.strict_mode else 0.3
         
-        # Make decision
+        # Check if the best topic is 'other' - if so, block the video
+        if best_topic.lower() == 'other':
+            processing_time = (time.time() - start_time) * 1000
+            logger.info(f"[ZERO-SHOT] BLOCKED: '{title}' | Topic: {best_topic} | Confidence: {best_score:.3f} | Reason: Topic is 'other' | [{processing_time:.2f}ms]")
+            return ClassifyResponse(
+                allowed=False,
+                topic=best_topic,
+                confidence=best_score,
+                method="api",
+                processing_time_ms=processing_time
+            )
+            
+        # Make decision for non-'other' topics
         is_allowed = best_score >= threshold
         
         processing_time = (time.time() - start_time) * 1000
         
-        logger.info(f"API classification for '{title}' - Topic: {best_topic} (confidence: {best_score:.3f}) - {'ALLOWED' if is_allowed else 'BLOCKED'} [{processing_time:.2f}ms]")
+        logger.info(f"[ZERO-SHOT] {'ALLOWED' if is_allowed else 'BLOCKED'}: '{title}' | Topic: {best_topic} | Confidence: {best_score:.3f} | Threshold: {threshold} | [{processing_time:.2f}ms]")
         
         return ClassifyResponse(
             allowed=is_allowed,
@@ -189,5 +204,5 @@ async def classify_simple(request: ClassifyRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PORT", 8001))
+    port = int(os.getenv("PORT", 8080))
     uvicorn.run(app, host="0.0.0.0", port=port)

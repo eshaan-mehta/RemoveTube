@@ -28,7 +28,7 @@ RemoveTube helps you stay focused and productive on YouTube by filtering content
    ```bash
    cd RemoveTube/server
    pip install -r requirements.txt
-   python -m uvicorn main:app --host 0.0.0.0 --port 8001
+   python -m uvicorn main:app --host 0.0.0.0 --port 8080
    ```
 
 ### Install the Extension
@@ -146,11 +146,11 @@ Track your productivity with built-in statistics:
 - Verify your allowed topics are set correctly in the session
 - Check if strict mode is enabled for more aggressive filtering
 - Try adding more specific keywords for your allowed content
-- Ensure the AI server is running on localhost:8001
+- Ensure the AI server is running on localhost:8080
 
 **AI server not working:**
-- Check that the server is running: `curl http://localhost:8001/health`
-- Restart the server: `python -m uvicorn main:app --host 0.0.0.0 --port 8001`
+- Check that the server is running: `curl http://localhost:8080/health`
+- Restart the server: `python -m uvicorn main:app --host 0.0.0.0 --port 8080`
 - Check browser console for connection error messages
 - Extension will automatically fall back to keyword matching if server fails
 
@@ -185,7 +185,7 @@ cd RemoveTube
 # Start the AI server
 cd server
 pip install -r requirements.txt
-python -m uvicorn main:app --host 0.0.0.0 --port 8001
+python -m uvicorn main:app --host 0.0.0.0 --port 8080
 
 # Load extension in Chrome
 # Open chrome://extensions/, enable Developer mode

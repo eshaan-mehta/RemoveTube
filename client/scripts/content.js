@@ -59,36 +59,20 @@
       overlay.innerHTML = `
         <div class="removetube-overlay">
           <div class="removetube-modal">
-            <h2>🎯 Welcome to RemoveTube!</h2>
-            <p>Let's set up your allowed content to help you stay focused using our powerful server-based AI.</p>
-            
+            <h2>Welcome to RemoveTube</h2>
+            <p>Let's set up your allowed content to help you stay focused.</p>
             <div class="removetube-form">
-              <div class="ai-info-section">
-                <div class="ai-info-card">
-                  <h3>🧠 Powered by Server-Based AI</h3>
-                  <p>RemoveTube uses advanced local AI models that run directly in your browser for:</p>
-                  <ul>
-                    <li>✅ <strong>Privacy:</strong> No data sent to external servers</li>
-                    <li>✅ <strong>Speed:</strong> Instant content analysis</li>
-                    <li>✅ <strong>Accuracy:</strong> Smart content classification</li>
-                    <li>✅ <strong>No Setup:</strong> Works immediately, no API keys needed</li>
-                  </ul>
-                </div>
-              </div>
-              
               <label for="removetube-topics">What content do you want to allow? (comma-separated) <span style="color: red;">*</span>:</label>
-              <input type="text" id="removetube-topics" placeholder="education, music, cooking, programming" required />
+              <input type="text" id="removetube-topics" placeholder="music, coding, math, chemistry, etc" required />
               <small style="color: #888; font-size: 12px;">This field is required. Enter at least one topic to continue.</small>
-              
               <div class="removetube-checkbox">
                 <input type="checkbox" id="removetube-strict" checked />
                 <label for="removetube-strict">Strict mode (block if uncertain)</label>
               </div>
-              
               <button id="removetube-save">Save & Continue</button>
             </div>
           </div>
-        </div>
+        </div> 
       `;
 
       // Add styles
@@ -885,7 +869,7 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(0, 0, 0, 0.9);
+        background: rgba(0, 0, 0, 0.98); /* Even darker background */
         z-index: 999999999;
         display: flex;
         align-items: center;
@@ -895,7 +879,7 @@
         <div style="
           text-align: center;
           color: white;
-          background: rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.08);
           padding: 40px;
           border-radius: 20px;
           backdrop-filter: blur(10px);
@@ -910,7 +894,7 @@
             margin: 0 auto 20px auto;
           "></div>
           <h3 style="margin: 0 0 10px 0; color: white;">🎯 RemoveTube</h3>
-          <p style="margin: 0; color: rgba(255, 255, 255, 0.8);">Checking if this content matches your allowed topics...</p>
+          <p style="margin: 0; color: rgba(255, 255, 255, 0.85); font-size: 18px;">Checking if this content matches your allowed topics...</p>
         </div>
       </div>
       <style>

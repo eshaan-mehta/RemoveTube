@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!statusElement || !statusContainer) return;
     
     try {
-      const response = await fetch('http://localhost:8001/health');
+      const response = await fetch('http://localhost:8080/health');
       if (response.ok) {
         const health = await response.json();
         if (health.status === 'healthy') {

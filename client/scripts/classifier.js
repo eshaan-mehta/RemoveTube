@@ -5,7 +5,7 @@
 
 class AIClassifier {
   constructor() {
-    this.serverUrl = 'http://localhost:8001';
+    this.serverUrl = 'http://localhost:8080';
     this.isInitialized = false;
     this.userTopics = [];
   }
@@ -44,17 +44,41 @@ class AIClassifier {
     if (!allowedTopics) {
       allowedTopics = this.userTopics;
       if (!allowedTopics || allowedTopics.length === 0) {
+        console.warn('No allowed topics set, using default programming topic');
         return this.fallbackToKeywordMatching(title, description, ['programming']);
       }
     }
 
+    // First try server classification
     try {
+      console.log('Attempting server classification...');
       const serverResult = await this.classifyWithServer(title, description, allowedTopics, strictMode);
-      if (serverResult) return serverResult;
+      if (serverResult) {
+        console.log('Server classification successful:', serverResult);
+        return serverResult;
+      }
     } catch (error) {
-      console.warn('RemoveTube: Server classification failed, using fallback:', error);
+      console.warn('Server classification failed:', error);
     }
 
+    // If server classification fails, try to initialize the server
+    try {
+      console.log('Attempting to initialize server...');
+      const initialized = await this.initialize();
+      if (initialized) {
+        console.log('Server initialized, retrying classification...');
+        const retryResult = await this.classifyWithServer(title, description, allowedTopics, strictMode);
+        if (retryResult) {
+          console.log('Retry classification successful:', retryResult);
+          return retryResult;
+        }
+      }
+    } catch (error) {
+      console.warn('Server initialization failed:', error);
+    }
+
+    // Only fall back to keyword matching if all server attempts fail
+    console.warn('All server attempts failed, falling back to keyword matching');
     return this.fallbackToKeywordMatching(title, description, allowedTopics);
   }
 
@@ -63,6 +87,12 @@ class AIClassifier {
    */
   async classifyWithServer(title, description, topics, strictMode) {
     try {
+      // Always add 'other' to the topics list if not present
+      let topicsWithOther = Array.isArray(topics) ? [...topics] : [];
+      if (!topicsWithOther.map(t => t.toLowerCase()).includes('other')) {
+        topicsWithOther.push('other');
+      }
+      console.log('Sending classification request to server...');
       // Use simple endpoint for easier testing and reliability
       const response = await fetch(`${this.serverUrl}/classify-simple`, {
         method: 'POST',
@@ -72,31 +102,38 @@ class AIClassifier {
         body: JSON.stringify({
           title,
           description,
-          topics,
+          topics: topicsWithOther,
           strict_mode: strictMode
         })
       });
 
       if (!response.ok) {
+        console.error(`Server responded with error status: ${response.status}`);
         throw new Error(`Server responded with ${response.status}`);
       }
 
       const result = await response.json();
+      console.log('Server classification response:', result);
       
+      if (!result || typeof result.allowed !== 'boolean') {
+        console.error('Invalid server response format:', result);
+        throw new Error('Invalid server response format');
+      }
+
       return {
         allowed: result.allowed,
-        confidence: result.confidence,
-        topic: result.topic,
+        confidence: result.confidence || 0,
+        topic: result.topic || 'unknown',
         method: result.method || 'server-classification',
         reason: result.allowed ? 'Content matches allowed topics' : 'Content does not match allowed topics',
-        similarity: result.confidence,
+        similarity: result.confidence || 0,
         threshold: strictMode ? 0.5 : 0.3,
-        processingTime: result.processing_time_ms
+        processingTime: result.processing_time_ms || 0
       };
 
     } catch (error) {
-      console.error('RemoveTube: Server classification error:', error);
-      return null;
+      console.error('Server classification error:', error);
+      throw error; // Re-throw to allow retry logic
     }
   }
 
