@@ -5,7 +5,7 @@
 
 class AIClassifier {
   constructor() {
-    this.serverUrl = 'http://localhost:8001';
+    this.serverUrl = 'http://localhost:8080';
     this.isInitialized = false;
     this.userTopics = [];
   }

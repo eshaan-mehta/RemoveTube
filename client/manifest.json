@@ -11,7 +11,7 @@
   
   "host_permissions": [
     "*://*.youtube.com/*",
-    "http://localhost:8001/*"
+    "http://localhost:8080/*"
   ],
   
   "content_scripts": [
@@ -36,7 +36,13 @@
   
   "web_accessible_resources": [
     {
-      "resources": ["scripts/classifier.js"],
+      "resources": [
+        "scripts/classifier.js",
+        "pages/setup_overlay.html",
+        "pages/block_overlay.html",
+        "styles/setup_overlay.css",
+        "styles/block_overlay.css"
+      ],
       "matches": ["*://*.youtube.com/*"]
     }
   ]

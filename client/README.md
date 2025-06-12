@@ -1,11 +1,10 @@
-# 🎯 RemoveTube - Anti-Procrastination Chrome Extension
+# RemoveTube: Anti-Procrastination Chrome Extension
 
-RemoveTube helps you stay focused and productive on YouTube by filtering content based on your allowed topics. Say goodbye to endless scrolling and unintended procrastination!
+RemoveTube helps you stay focused and productive on YouTube by filtering content based on topics that you preselect. Say goodbye to endless scrolling and unintended procrastination!
 
-## ✨ Features
+## Features
 
 - **Smart Content Filtering**: Automatically blocks YouTube videos that don't match your allowed topics
-- **Server-Based AI**: Uses cutting-edge AI models running on a local server for maximum accuracy!
 - **Advanced Classification**: Semantic similarity matching using sentence-transformers
 - **Privacy First**: All AI processing happens on your local machine - no external API calls
 - **Customizable Topics**: Set your own allowed content categories
@@ -13,14 +12,14 @@ RemoveTube helps you stay focused and productive on YouTube by filtering content
 - **Usage Statistics**: Track your productivity with daily stats
 - **Easy Setup**: Session-based configuration that appears every time you visit YouTube
 
-## 🚀 How It Works
+## How It Works
 
 1. **Initial Setup**: When you visit YouTube, you'll be prompted to set up your allowed content topics
 2. **Content Analysis**: Each video you try to watch is analyzed by the AI server against your allowed topics
 3. **Smart Blocking**: Videos that don't match are blocked with a helpful explanation
 4. **Session-Based**: Your topics are saved only for the current session and cleared when you leave YouTube
 
-## 📋 Installation
+## Installation
 
 ### Prerequisites
 
@@ -40,7 +39,7 @@ RemoveTube helps you stay focused and productive on YouTube by filtering content
 5. The extension will appear in your browser toolbar
 6. Navigate to YouTube.com to start the setup process
 
-## ⚙️ Configuration
+## Configuration
 
 ### Setting Up Your Allowed Topics
 
@@ -60,7 +59,7 @@ RemoveTube uses advanced AI models running on a local server:
 - **Local Processing**: Runs on your machine - no external API calls
 - **Fast Response**: ~50ms classification time for quick filtering
 
-## 🛠️ How to Use
+## How to Use
 
 ### Basic Usage
 
@@ -87,7 +86,7 @@ Choose from predefined topic sets:
 - 🧘 **Mindfulness**: meditation, relaxation, sleep sounds
 - 📰 **News**: current events, politics, economics
 
-## 🔧 Technical Details
+## Technical Details
 
 ### Content Analysis Methods
 
@@ -166,54 +165,5 @@ Track your productivity with built-in statistics:
 - **Browser Performance**: Extension is optimized for minimal resource usage
 - **Session Storage**: Topics cleared automatically when leaving YouTube
 
-## 🤝 Contributing
 
-We welcome contributions! Here's how you can help:
-
-1. **Report Bugs**: Use GitHub issues to report problems
-2. **Suggest Features**: Share ideas for new functionality
-3. **Submit PRs**: Contribute code improvements
-4. **Documentation**: Help improve this README and inline docs
-
-### Development Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/RemoveTube.git
-cd RemoveTube
-
-# Start the AI server
-cd server
-pip install -r requirements.txt
-python -m uvicorn main:app --host 0.0.0.0 --port 8001
-
-# Load extension in Chrome
-# Open chrome://extensions/, enable Developer mode
-# Click "Load unpacked" and select the client/ folder
-```
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **FastAPI**: For providing an excellent web framework for the AI server
-- **sentence-transformers**: For the all-MiniLM-L6-v2 model enabling semantic understanding
-- **scikit-learn**: For cosine similarity calculations
-- **Chrome Extension APIs**: For enabling seamless browser integration
-- **Open Source Community**: For inspiration and best practices
-
-## 📞 Support
-
-Need help? Have questions?
-
-- **GitHub Issues**: [Report bugs or request features](https://github.com/yourusername/RemoveTube/issues)
-- **Documentation**: Check this README for common solutions
-- **Community**: Join discussions in GitHub Discussions
-
----
-
-**Stay focused, stay productive!** 🎯
-
-Made with ❤️ for anyone trying to use YouTube more intentionally.
+### Enjoy!

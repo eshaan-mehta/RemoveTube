@@ -51,350 +51,109 @@
     }
   }
 
-  function createSetupOverlay() {
-      console.log('Creating setup overlay without API key sections');
-      
-      const overlay = document.createElement('div');
-      overlay.id = 'removetube-setup-overlay';
-      overlay.innerHTML = `
-        <div class="removetube-overlay">
-          <div class="removetube-modal">
-            <h2>🎯 Welcome to RemoveTube!</h2>
-            <p>Let's set up your allowed content to help you stay focused using our powerful server-based AI.</p>
-            
-            <div class="removetube-form">
-              <div class="ai-info-section">
-                <div class="ai-info-card">
-                  <h3>🧠 Powered by Server-Based AI</h3>
-                  <p>RemoveTube uses advanced local AI models that run directly in your browser for:</p>
-                  <ul>
-                    <li>✅ <strong>Privacy:</strong> No data sent to external servers</li>
-                    <li>✅ <strong>Speed:</strong> Instant content analysis</li>
-                    <li>✅ <strong>Accuracy:</strong> Smart content classification</li>
-                    <li>✅ <strong>No Setup:</strong> Works immediately, no API keys needed</li>
-                  </ul>
-                </div>
-              </div>
-              
-              <label for="removetube-topics">What content do you want to allow? (comma-separated) <span style="color: red;">*</span>:</label>
-              <input type="text" id="removetube-topics" placeholder="education, music, cooking, programming" required />
-              <small style="color: #888; font-size: 12px;">This field is required. Enter at least one topic to continue.</small>
-              
-              <div class="removetube-checkbox">
-                <input type="checkbox" id="removetube-strict" checked />
-                <label for="removetube-strict">Strict mode (block if uncertain)</label>
-              </div>
-              
-              <button id="removetube-save">Save & Continue</button>
-            </div>
-          </div>
-        </div>
-      `;
+  async function createSetupOverlay() {
+    console.log('Creating setup overlay from external HTML and CSS');
 
-      // Add styles
-      const style = document.createElement('style');
-      style.textContent = `
-        .removetube-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background: #1a1a1a;
-          z-index: 999999999;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-          backdrop-filter: none;
-          overflow: hidden;
-        }
-        
-        .removetube-overlay::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          z-index: -1;
-        }
-        
-        .removetube-modal {
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(10px);
-          padding: 40px;
-          border-radius: 20px;
-          max-width: 700px;
-          width: 90%;
-          max-height: 90vh;
-          overflow-y: auto;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .removetube-modal h2 {
-          margin: 0 0 20px 0;
-          color: #333;
-          text-align: center;
-          font-size: 28px;
-          font-weight: 600;
-        }
-        
-        .removetube-modal p {
-          margin: 0 0 30px 0;
-          color: #666;
-          text-align: center;
-          font-size: 16px;
-          line-height: 1.5;
-        }
-        
-        .ai-info-section {
-          margin-bottom: 30px;
-        }
-        
-        .ai-info-card {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          padding: 20px;
-          border-radius: 12px;
-          margin-bottom: 20px;
-        }
-        
-        .ai-info-card h3 {
-          margin: 0 0 15px 0;
-          font-size: 18px;
-          font-weight: 600;
-        }
-        
-        .ai-info-card p {
-          margin: 0 0 15px 0;
-          color: rgba(255, 255, 255, 0.9);
-          text-align: left;
-          font-size: 14px;
-        }
-        
-        .ai-info-card ul {
-          margin: 0;
-          padding: 0;
-          list-style: none;
-        }
-        
-        .ai-info-card li {
-          margin: 8px 0;
-          padding: 0;
-          color: rgba(255, 255, 255, 0.9);
-          font-size: 14px;
-        }
-        
-        .removetube-form label {
-          display: block;
-          margin: 20px 0 8px 0;
-          font-weight: 600;
-          color: #333;
-          font-size: 14px;
-        }
-        
-        .removetube-form input[type="text"] {
-          width: 100%;
-          padding: 14px 16px;
-          border: 2px solid #e1e5e9;
-          border-radius: 10px;
-          box-sizing: border-box;
-          font-size: 14px;
-          transition: border-color 0.3s ease;
-        }
-        
-        .removetube-form input[type="text"]:focus {
-          outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .removetube-form input[type="text"][required] {
-          border-color: #d32f2f;
-        }
-        
-        .removetube-form input[type="text"][required]:valid {
-          border-color: #2e7d32;
-        }
-        
-        .removetube-form small {
-          color: #888;
-          font-size: 12px;
-          margin-top: 6px;
-          display: block;
-          line-height: 1.4;
-        }
-        
-        .removetube-checkbox {
-          display: flex;
-          align-items: center;
-          margin: 20px 0;
-          padding: 12px;
-          background: rgba(102, 126, 234, 0.05);
-          border-radius: 8px;
-        }
-        
-        .removetube-checkbox input {
-          margin-right: 12px;
-          transform: scale(1.2);
-        }
-        
-        .removetube-checkbox label {
-          margin: 0;
-          color: #333;
-          font-size: 14px;
-        }
-        
-        .removetube-form button {
-          width: 100%;
-          padding: 16px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          border: none;
-          border-radius: 10px;
-          font-size: 16px;
-          font-weight: 600;
-          cursor: pointer;
-          margin-top: 20px;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        
-        .removetube-form button:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-        }
-        
-        .removetube-form button:active {
-          transform: translateY(0);
-        }
-        
-        /* Hide all page content behind overlay */
-        body.removetube-overlay-active {
-          overflow: hidden;
-        }
-        
-        body.removetube-overlay-active > *:not(#removetube-setup-overlay) {
-          display: none !important;
-        }
-      `;      document.head.appendChild(style);
-      document.body.appendChild(overlay);
-      
-      // Hide all page content behind the overlay
-      document.body.classList.add('removetube-overlay-active');
+    // Load HTML
+    const htmlResp = await fetch(chrome.runtime.getURL('pages/setup_overlay.html'));
+    const overlayHtml = await htmlResp.text();
 
-      // Wait for DOM elements to be available before attaching event listeners
-      setTimeout(() => {
-        // Handle save button with improved error handling and timing
-        const saveButton = document.getElementById('removetube-save');
-        if (saveButton) {
-          saveButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            console.log('Save button clicked');
-            
-            // Add loading state to button
-            const originalText = saveButton.textContent;
-            saveButton.textContent = '⏳ Saving...';
-            saveButton.disabled = true;
-            
-            try {
-              const topicsInput = document.getElementById('removetube-topics');
-              const strictInput = document.getElementById('removetube-strict');
-              
-              if (!topicsInput || !strictInput) {
-                throw new Error('Required form elements not found');
-              }
-              
-              const topics = topicsInput.value
-                .split(',')
-                .map(topic => topic.trim())
-                .filter(topic => topic.length > 0);
-              
-              // Validate that at least one topic is provided
-              if (topics.length === 0) {
-                alert('Please enter at least one allowed topic before continuing.');
-                topicsInput.focus();
-                // Reset button state
+    // Remove any existing overlay
+    const existing = document.getElementById('removetube-setup-overlay');
+    if (existing) existing.remove();
+
+    // Parse the HTML and set the ID on the root overlay div
+    const temp = document.createElement('div');
+    temp.innerHTML = overlayHtml;
+    const overlayElem = temp.firstElementChild;
+    overlayElem.id = 'removetube-setup-overlay';
+    document.body.appendChild(overlayElem);
+    document.body.classList.add('removetube-overlay-active');
+
+    // Wait for DOM elements to be available before attaching event listeners
+    setTimeout(() => {
+      const saveButton = document.getElementById('removetube-save');
+      if (saveButton) {
+        saveButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          console.log('Save button clicked');
+          const originalText = saveButton.textContent;
+          saveButton.textContent = '⏳ Saving...';
+          saveButton.disabled = true;
+          try {
+            const topicsInput = document.getElementById('removetube-topics');
+            const strictInput = document.getElementById('removetube-strict');
+            if (!topicsInput || !strictInput) {
+              throw new Error('Required form elements not found');
+            }
+            const topics = topicsInput.value
+              .split(',')
+              .map(topic => topic.trim())
+              .filter(topic => topic.length > 0);
+            if (topics.length === 0) {
+              alert('Please enter at least one allowed topic before continuing.');
+              topicsInput.focus();
+              saveButton.textContent = originalText;
+              saveButton.disabled = false;
+              return;
+            }
+            const strict = strictInput.checked;
+            const sessionData = {
+              sessionTopics: topics,
+              sessionStrictMode: strict
+            };
+            console.log('Attempting to save session data:', sessionData);
+            if (!chrome || !chrome.runtime) {
+              throw new Error('Chrome extension context is not available');
+            }
+            chrome.storage.sync.set({
+              allowedTopics: topics,
+              strictMode: strict,
+              isSetupComplete: true
+            }, async () => {
+              if (chrome.runtime.lastError) {
+                console.error('RemoveTube: Error saving settings:', chrome.runtime.lastError.message);
+                alert('Error saving settings: ' + chrome.runtime.lastError.message + '. Please try again.');
                 saveButton.textContent = originalText;
                 saveButton.disabled = false;
                 return;
               }
-              
-              const strict = strictInput.checked;
-
-              // Save to session storage (topics expire when leaving YouTube)
-              const sessionData = {
-                sessionTopics: topics,
-                sessionStrictMode: strict
-              };
-              
-              console.log('Attempting to save session data:', sessionData);
-              
-              // Verify chrome extension context before saving
-              if (!chrome || !chrome.runtime) {
-                throw new Error('Chrome extension context is not available');
+              console.log('Settings saved successfully, setting up AI server...');
+              try {
+                saveButton.textContent = 'Setting up AI...';
+                await window.aiClassifier.setupTopics(topics);
+                console.log('AI server setup complete');
+              } catch (serverError) {
+                console.warn('Server setup failed, will use fallback:', serverError);
               }
-
-              chrome.storage.sync.set({
-                allowedTopics: topics,
-                strictMode: strict,
-                isSetupComplete: true
-              }, async () => {
-                if (chrome.runtime.lastError) {
-                  console.error('RemoveTube: Error saving settings:', chrome.runtime.lastError.message);
-                  alert('Error saving settings: ' + chrome.runtime.lastError.message + '. Please try again.');
-                  // Reset button state
-                  saveButton.textContent = originalText;
-                  saveButton.disabled = false;
-                  return;
+              try {
+                overlayElem.remove();
+                document.body.classList.remove('removetube-overlay-active');
+                allowedTopics = topics;
+                strictMode = strict;
+                if (window.location.pathname.includes('/watch')) {
+                  setTimeout(() => checkCurrentVideo(), 1000);
                 }
-                console.log('Settings saved successfully, setting up AI server...');
-                // Setup topics on the AI server
-                try {
-                  saveButton.textContent = '🧠 Setting up AI...';
-                  await window.aiClassifier.setupTopics(topics);
-                  console.log('AI server setup complete');
-                } catch (serverError) {
-                  console.warn('Server setup failed, will use fallback:', serverError);
-                  // Don't fail the entire setup if server is unavailable
-                }
-                // Cleanup overlay
-                try {
-                  overlay.remove();
-                  style.remove();
-                  document.body.classList.remove('removetube-overlay-active');
-                  allowedTopics = topics;
-                  strictMode = strict;
-                  if (window.location.pathname.includes('/watch')) {
-                    setTimeout(() => checkCurrentVideo(), 1000);
-                  }
-                } catch (cleanupError) {
-                  console.warn('Error during overlay cleanup:', cleanupError);
-                }
-                // Reload settings to confirm they were saved
-                loadSettings().then((isComplete) => {
-                  console.log('RemoveTube setup complete! Settings reloaded:', isComplete);
-                }).catch((error) => {
-                  console.error('RemoveTube: Error loading settings after setup:', error);
-                });
+              } catch (cleanupError) {
+                console.warn('Error during overlay cleanup:', cleanupError);
+              }
+              loadSettings().then((isComplete) => {
+                console.log('RemoveTube setup complete! Settings reloaded:', isComplete);
+              }).catch((error) => {
+                console.error('RemoveTube: Error loading settings after setup:', error);
               });
-              
-            } catch (error) {
-              console.error('Error during save operation:', error);
-              alert('Error saving settings: ' + error.message + '. Please try again.');
-              // Reset button state
-              saveButton.textContent = originalText;
-              saveButton.disabled = false;
-            }
-          });
-        } else {
-          console.error('Save button not found!');
-        }
-        
-      }, 100); // End of setTimeout for event listener attachment
-    
+            });
+          } catch (error) {
+            console.error('Error during save operation:', error);
+            alert('Error saving settings: ' + error.message + '. Please try again.');
+            saveButton.textContent = originalText;
+            saveButton.disabled = false;
+          }
+        });
+      } else {
+        console.error('Save button not found!');
+      }
+    }, 100);
     console.log('Setup overlay created and event listeners attached');
   }
 
@@ -469,210 +228,106 @@
         return;
       }
     }
-    // Set blocked video flag to prevent storage access
     isVideoBlocked = true;
-    
-    // Store original page state before blocking
     const originalTitle = document.title;
     const originalUrl = window.location.href;
-    
     console.log('Blocking video:', { originalUrl, reason, topic, confidence });
-    
-    document.body.innerHTML = `
-      <div style="
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        font-family: Arial, sans-serif;
-        background: #f5f5f5;
-        margin: 0;
-        padding: 20px;
-        box-sizing: border-box;
-      ">
-        <div style="
-          text-align: center;
-          background: white;
-          padding: 40px;
-          border-radius: 10px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-          max-width: 500px;
-        ">
-          <div style="font-size: 48px; margin-bottom: 20px;">🚫</div>
-          <h2 style="color: #d32f2f; margin: 0 0 15px 0;">Content Blocked</h2>
-          <p style="color: #666; margin: 0 0 20px 0; line-height: 1.5;">
-            This video doesn't match your allowed topics and has been blocked to help you stay focused.
-          </p>
-          <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <strong>Detected topic:</strong> ${topic || 'Unknown'}<br>
-            <strong>Confidence:</strong> ${Math.round((confidence || 0) * 100)}%<br>
-            <strong>Allowed topics:</strong> ${allowedTopics.join(', ')}
-          </div>
-          <p style="color: #ff9800; font-size: 14px; margin: 15px 0 5px 0; line-height: 1.4;">
-            <strong>Think this is a mistake?</strong> Use "Watch Anyway" if the video was incorrectly detected.
-          </p>
-          <button id="go-back-btn" style="
-            background: #1976d2;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 10px;
-          ">← Go Back</button>
-          <button id="settings-btn" style="
-            background: #666;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 10px;
-          ">⚙️ Settings</button>
-          <button id="watch-anyway-btn" style="
-            background: #f57c00;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-          ">⚠️ Watch Anyway</button>
-        </div>
-      </div>
-    `;
 
-    // Add event listeners after the content is created
+    // Load block overlay HTML
+    const htmlResp = await fetch(chrome.runtime.getURL('pages/block_overlay.html'));
+    let overlayHtml = await htmlResp.text();
+    overlayHtml = overlayHtml
+      .replace('{{topic}}', topic || 'Unknown')
+      .replace('{{confidence}}', Math.round((confidence || 0) * 100))
+      .replace('{{allowedTopics}}', allowedTopics.join(', '));
+
+    // Remove all body content and inject overlay
+    document.body.innerHTML = overlayHtml;
+
+    // Load CSS (add only once)
+    if (!document.getElementById('removetube-block-css')) {
+      const cssLink = document.createElement('link');
+      cssLink.id = 'removetube-block-css';
+      cssLink.rel = 'stylesheet';
+      cssLink.type = 'text/css';
+      cssLink.href = chrome.runtime.getURL('styles/block_overlay.css');
+      document.head.appendChild(cssLink);
+    }
+
     setTimeout(() => {
       const goBackBtn = document.getElementById('go-back-btn');
       const settingsBtn = document.getElementById('settings-btn');
       const watchAnywayBtn = document.getElementById('watch-anyway-btn');
-      
-      // Store original URL to detect navigation
       const blockedVideoUrl = window.location.href;
       console.log('Video blocked at URL:', blockedVideoUrl);
-      
-      // Set up navigation detection
       const checkForNavigation = () => {
         const currentUrl = window.location.href;
         if (currentUrl !== blockedVideoUrl) {
-          console.log('Navigation detected! URL changed from', blockedVideoUrl, 'to', currentUrl);
-          // Reset blocked video flag since user has navigated away
           isVideoBlocked = false;
-          // Clear the navigation checker
           clearInterval(navigationChecker);
-          // Remove the blocking overlay since user has navigated away
           const blockingOverlay = document.querySelector('body');
           if (blockingOverlay && blockingOverlay.innerHTML.includes('Content Blocked')) {
-            console.log('Removing blocking overlay after navigation');
-            // Force page reload to clear blocked content and load new page
             setTimeout(() => {
               location.reload();
             }, 50);
           }
         }
       };
-      
-      // Check for navigation every 500ms
       const navigationChecker = setInterval(checkForNavigation, 500);
-      
-      // Clean up interval after 10 seconds (navigation should happen quickly)
       setTimeout(() => {
         clearInterval(navigationChecker);
       }, 10000);
-
       if (goBackBtn) {
         goBackBtn.addEventListener('click', (e) => {
           e.preventDefault();
-          console.log('Go back button clicked');
-          
-          // Immediately show loading state
           goBackBtn.textContent = '⏳ Going back...';
           goBackBtn.disabled = true;
           goBackBtn.style.background = '#999';
-          
-          // Clear the interval immediately to prevent further storage access
           clearInterval(navigationChecker);
-          
-          // Reset blocked video flag since we're navigating away
           isVideoBlocked = false;
-          
           const currentUrl = window.location.href;
-          console.log('Current URL before navigation:', currentUrl);
-          
-          // Try history.back() first, then fallback to YouTube home
           try {
             if (window.history.length > 1) {
-              console.log('Using history.back()');
-              
-              // Set up a listener for when the page actually changes
               const handlePopState = () => {
-                console.log('Navigation completed via history.back()');
                 window.removeEventListener('popstate', handlePopState);
-                // Force reload to clear the blocked content
                 setTimeout(() => {
                   if (document.body.innerHTML.includes('Content Blocked')) {
-                    console.log('Blocked content still visible, reloading page');
                     location.reload();
                   }
                 }, 100);
               };
-              
               window.addEventListener('popstate', handlePopState);
-              
-              // Also set a backup timer in case popstate doesn't fire
               setTimeout(() => {
                 window.removeEventListener('popstate', handlePopState);
                 if (window.location.href === currentUrl) {
-                  console.log('history.back() failed, navigating to YouTube home');
                   window.location.assign('https://www.youtube.com/');
                 } else if (document.body.innerHTML.includes('Content Blocked')) {
-                  console.log('URL changed but blocked content still visible, reloading');
                   location.reload();
                 }
               }, 1000);
-              
-              // Additional fallback: if still blocked after 2 seconds, force clear
               setTimeout(() => {
                 if (document.body.innerHTML.includes('Content Blocked')) {
-                  console.log('Blocked content persisted, forcing navigation to YouTube home');
                   window.location.assign('https://www.youtube.com/');
                 }
               }, 2000);
-              
               window.history.back();
-            } else {
-              console.log('No history, navigating to YouTube home');
-              window.location.assign('https://www.youtube.com/');
             }
+            window.location.assign('https://www.youtube.com/');
           } catch (error) {
-            console.error('Navigation error:', error);
-            console.log('Fallback: navigating to YouTube home');
             window.location.assign('https://www.youtube.com/');
           }
         });
       }
-
       if (settingsBtn) {
         settingsBtn.addEventListener('click', (e) => {
           e.preventDefault();
-          console.log('Settings button clicked');
-          
-          // Clear the interval immediately to prevent further storage access
           clearInterval(navigationChecker);
-          
-          // Send message to background script to open options
           try {
             if (chrome && chrome.runtime && chrome.runtime.sendMessage) {
               chrome.runtime.sendMessage({ action: 'openOptions' }, (response) => {
                 if (chrome.runtime.lastError) {
-                  console.warn('Runtime error:', chrome.runtime.lastError);
                   fallbackToDirectOptionsOpen();
                 } else if (response && !response.success) {
-                  console.warn('Background script error:', response.error);
                   fallbackToDirectOptionsOpen();
                 }
               });
@@ -680,30 +335,19 @@
               fallbackToDirectOptionsOpen();
             }
           } catch (error) {
-            console.error('Error sending message to background:', error);
             fallbackToDirectOptionsOpen();
           }
         });
       }
-
       if (watchAnywayBtn) {
         watchAnywayBtn.addEventListener('click', async (e) => {
           e.preventDefault();
-          console.log('Watch Anyway button clicked - user override for misdetection');
-          console.log('Override details:', { 
-            url: originalUrl, 
-            detectedTopic: topic, 
-            confidence: confidence,
-            allowedTopics: allowedTopics 
-          });
-          // Show confirmation to ensure user understands
           const confirmed = confirm(
             'Are you sure you want to watch this video?\n\n' +
             'This will override the content filter for this video only. The filter will continue to work for other videos.\n\n' +
             'Click OK to proceed or Cancel to go back.'
           );
           if (confirmed) {
-            // Store override for this video ID
             const videoId = getVideoIdFromUrl(originalUrl);
             if (videoId) {
               chrome.storage.local.get(['watchAnywayOverrides'], result => {
@@ -711,38 +355,27 @@
                 if (!overrides.includes(videoId)) {
                   overrides.push(videoId);
                   chrome.storage.local.set({ watchAnywayOverrides: overrides });
-                  console.log('Watch Anyway override saved for video:', videoId);
                 }
               });
             }
-            // Show loading state
             watchAnywayBtn.textContent = '⏳ Loading video...';
             watchAnywayBtn.disabled = true;
             watchAnywayBtn.style.background = '#999';
-            // Clear the interval immediately
             clearInterval(navigationChecker);
-            // Reset blocked video flag
             isVideoBlocked = false;
-            // Instead of reloading, restore the original page (simulate navigation)
             window.location.assign(originalUrl);
-          } else {
-            console.log('User cancelled override');
           }
         });
       }
-
       function fallbackToDirectOptionsOpen() {
         try {
-          // Try to get extension ID and open options page directly
           if (chrome && chrome.runtime && chrome.runtime.id) {
             const optionsUrl = chrome.runtime.getURL('options.html');
             window.open(optionsUrl, '_blank');
           } else {
-            // If all else fails, alert the user
             alert('Please open extension settings from the browser toolbar (click the RemoveTube icon).');
           }
         } catch (error) {
-          console.error('All fallback methods failed:', error);
           alert('Please open extension settings from the browser toolbar (click the RemoveTube icon).');
         }
       }
